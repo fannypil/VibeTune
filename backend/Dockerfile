@@ -1,11 +1,16 @@
+# Use official Python image
 FROM python:3.12
 
-WORKDIR /code
+# Set working directory
+WORKDIR /app
 
-COPY ./requirements.txt /code/requirements.txt
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+# Copy only backend code
+COPY . .
 
-COPY . /code
+EXPOSE 8000
 
-CMD ["fastapi", "run", "./main.py", "--port", "80"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
