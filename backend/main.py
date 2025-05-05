@@ -2,9 +2,12 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from lastfm_services import get_lastfm_top_tracks, search_lastfm_tracks
 from models import Track, SearchResponse
-
+from api.playlist import router as playlist_router
 
 app = FastAPI()
+
+# Importing the playlist router
+app.include_router(playlist_router)
 
 # Allow CORS for frontend
 app.add_middleware(CORSMiddleware,
