@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from lastfm_services import get_lastfm_top_tracks, search_lastfm_tracks
+from models import Track, SearchResponse
 
 
 app = FastAPI()
@@ -12,10 +13,11 @@ app.add_middleware(CORSMiddleware,
                     allow_methods=["*"],
                     allow_headers=["*"])
 
-@app.get("/")
+@app.get("/", response_model=dict)
 async def root():
     return {"message": "Welcome to VibeTune backend!"}
 
+# dummy endpoint to simulate a playlist
 @app.get("/playlist")
 async def get_playlist():
     playlist = [
@@ -25,27 +27,35 @@ async def get_playlist():
     ]
     return playlist
 
-@app.get("/lastfm-top-tracks")
+@app.get("/lastfm-top-tracks", response_model=SearchResponse)
 async def lastfm_top_tracks():
     try:
-        data = get_lastfm_top_tracks()
-        return data
+        tracks = get_lastfm_top_tracks()
+        simplified_tracks=[
+            Track(
+                name=track.get("name"),
+                artist=track.get("artist", {}).get("name"),
+                url=track.get("url")
+            )
+            for track in tracks
+        ]
+        return {"results": simplified_tracks}
     except Exception as e:
         return {"error": str(e)}
     
     
-@app.get("/search")
+@app.get("/search", response_model=SearchResponse)
 async def search_tracks(q: str = Query(..., description="Song name or artist to search")):
     try:
-        results = search_lastfm_tracks(q)
-        simplified = [
-            {
-                "name": track.get("name"),
-                "artist": track.get("artist"),
-                "url": track.get("url")
-            }
-            for track in results
+        tracks = search_lastfm_tracks(q)
+        simplified_tracks = [
+           Track(
+                name=track.get("name"),
+                artist=track.get("artist"),
+                url=track.get("url")
+            )
+            for track in tracks
         ]
-        return {"results": simplified}
+        return {"results": simplified_tracks}
     except Exception as e:
         return {"error": str(e)}
