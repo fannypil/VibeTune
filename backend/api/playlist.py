@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from typing import List
 from models import Track, PlaylistResponse
-from playlist_service import save_playlist_for_user, get_playlist_for_user
+from playlist_manager import save_playlist_for_user, get_playlist_for_user
 
 router = APIRouter()
 
