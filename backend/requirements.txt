@@ -4,4 +4,8 @@ python-dotenv
 requests
 pydantic
 typing
+pydantic[email]
+pydantic
+
+
 
