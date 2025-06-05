@@ -1,12 +1,24 @@
-from fastapi import APIRouter,HttpException
+from fastapi import APIRouter, HTTPException
+from models import UserCreate, UserLogin, Token
 
-router= APIRouter(prefix="/auth", tags=["Authentication"])
+router = APIRouter(prefix="/auth", tags=["Authentication"])
 
-@router.post("/register")
-async def register_user(username: str, password: str):
-    """Register a new user and return access token"""
+@router.post("/register", response_model=Token)
+async def register(user: UserCreate):
+    """Dummy register endpoint"""
+    return {
+        "access_token": "dummy_token",
+        "token_type": "bearer"
+    }
 
-@router.post("/login")
-async def login_user(username: str, password: str):
-    """Login user and return access token"""
+@router.post("/login", response_model=Token)
+async def login(user: UserLogin):
+    """Dummy login endpoint"""
+    return {
+        "access_token": "dummy_token",
+        "token_type": "bearer"
+    }
 
+# Dummy authentication for testing
+async def get_current_user():
+    return {"id": "dummy_user_id", "username": "dummy_user"}
