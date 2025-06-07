@@ -5,7 +5,9 @@ requests
 pydantic
 typing
 pydantic[email]
-pydantic
-
-
-
+sqlalchemy
+alembic
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+aiosqlite

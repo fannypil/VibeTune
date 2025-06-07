@@ -35,3 +35,12 @@ build/
 *.log
 .env.local
 .env.*.local
+
+# Database
+*.db
+*.sqlite3
+migrations/versions/*
+!migrations/versions/.gitkeep
+
+# Alembic
+alembic.ini
