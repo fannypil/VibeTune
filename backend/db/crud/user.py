@@ -3,12 +3,13 @@ from typing import Optional, List
 from db.models.user import User
 from db.schemas.user import UserCreate
 from passlib.context import CryptContext
+from utils.security import get_password_hash
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class UserCRUD:
     def create_user(self, db: Session, user: UserCreate) -> User:
-        hashed_password = pwd_context.hash(user.password)
+        hashed_password = get_password_hash(user.password)
         db_user = User(
             username=user.username,
             first_name=user.first_name,
