@@ -6,11 +6,11 @@ class UserBase(BaseModel):
     username: str = Field(..., min_length=3,
                            max_length=50,
                            description="Username must be between 3 and 50 characters")
+    email: EmailStr = Field(..., description="Email must be a valid email address")
     first_name: str = Field(..., min_length=1
                             ,description="First name is required")
     last_name: str = Field(..., min_length=1,
                            description="Last name is required")
-    email: EmailStr = Field(..., description="Email must be a valid email address")
     
     @validator('email')
     def email_must_be_valid(cls, v):
@@ -32,8 +32,6 @@ class UserCreate(UserBase):
     
 class UserOut(UserBase):
     id: int
-    playlists: List[PlaylistOut] = []
-    favorites: List[PlaylistOut] = []
 
     class Config:
         orm_mode = True

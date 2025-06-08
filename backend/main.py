@@ -6,11 +6,12 @@ from routes.auth import router as auth_router
 from routes.playlist import router as playlist_router
 from routes.user import router as user_router
 from db.session import engine
-from db.models import Base
+from db.models import Base, user
 
 
 # Create database tables
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
+user.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 

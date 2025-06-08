@@ -5,10 +5,18 @@ from datetime import datetime
 class UserBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     email: EmailStr
-    full_name: Optional[str] = None
+    first_name: str
+    last_name: str
 
 class UserCreate(UserBase):
     password: str = Field(..., min_length=8)
+
+
+class UserOut(UserBase):
+    id: str
+    
+    class Config:
+        orm_mode = True
 
 class UserResponse(UserBase):
     id: str

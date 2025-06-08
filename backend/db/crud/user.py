@@ -1,26 +1,34 @@
 from sqlalchemy.orm import Session
 from typing import Optional, List
 from db.models.user import User
-from db.schemas.user import UserCreate
+from schemas.user import UserCreate
 from passlib.context import CryptContext
 from utils.security import get_password_hash
+import logging
+
+logger = logging.getLogger(__name__)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class UserCRUD:
     def create_user(self, db: Session, user: UserCreate) -> User:
-        hashed_password = get_password_hash(user.password)
-        db_user = User(
-            username=user.username,
-            first_name=user.first_name,
-            last_name=user.last_name,
-            email=user.email,
-            hashed_password=hashed_password
-        )
-        db.add(db_user)
-        db.commit()
-        db.refresh(db_user)
-        return db_user
+        try:
+            hashed_password = get_password_hash(user.password)
+            db_user = User(
+                username=user.username,
+                first_name=user.first_name,
+                last_name=user.last_name,
+                email=user.email,
+                hashed_password=hashed_password
+            )
+            db.add(db_user)
+            db.commit()
+            db.refresh(db_user)
+            return db_user
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error creating user: {str(e)}", exc_info=True)
+            raise
 
     def get_user(self, db: Session, user_id: int) -> Optional[User]:
         return db.query(User).filter(User.id == user_id).first()
