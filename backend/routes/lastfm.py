@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
 from lastfm_client import get_lastfm_top_tracks, search_lastfm_tracks
-from models import Track, SearchResponse
+from schemas import Track, SearchResponse
 
 router = APIRouter()
 

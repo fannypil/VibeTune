@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from models import UserCreate, UserLogin, Token
+from schemas import UserCreate, UserLogin, Token
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 

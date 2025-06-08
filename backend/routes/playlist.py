@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
-from models import PlaylistResponse, PlaylistCreate, PlaylistUpdate, Track
+from schemas import PlaylistResponse, PlaylistCreate, PlaylistUpdate, Track
 from .auth import get_current_user
 
 router = APIRouter(prefix="/playlist", tags=["Playlists"])

@@ -1,5 +1,5 @@
 from typing import Dict, List, Optional
-from models import Track, PlaylistCreate, PlaylistResponse, PlaylistUpdate
+from schemas import Track, PlaylistCreate, PlaylistResponse, PlaylistUpdate
 from fastapi import HTTPException
 
 
