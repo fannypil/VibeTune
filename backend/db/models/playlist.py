@@ -9,8 +9,9 @@ class Playlist(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     description = Column(String, nullable=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    is_favorite = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+    user_id = Column(Integer, ForeignKey("users.id"))
 
     # Relationships
     owner = relationship("User", back_populates="playlists")
