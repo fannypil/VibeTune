@@ -14,7 +14,7 @@ class PlaylistCRUD:
             db_playlist = Playlist(
                 name=playlist.name,
                 description=playlist.description,
-                is_favorite=playlist.is_favorite,
+                # is_favorite=playlist.is_favorite,
                 user_id=user_id
             )
             
@@ -42,8 +42,6 @@ class PlaylistCRUD:
             logger.error(f"Error fetching playlist {playlist_id}: {str(e)}", exc_info=True)
             raise
 
-    def get_playlist(self, db: Session, playlist_id: int) -> Optional[Playlist]:
-        return db.query(Playlist).filter(Playlist.id == playlist_id).first()
 
     def get_user_playlists(self, db: Session, user_id: int) -> List[Playlist]:
         return db.query(Playlist).filter(Playlist.user_id == user_id).all()
@@ -65,6 +63,24 @@ class PlaylistCRUD:
             logger.error(f"Error updating playlist: {str(e)}")
             raise
 
+    def favorite_playlist(self, db: Session, playlist_id: int, user) -> bool:
+        playlist = self.get_playlist(db, playlist_id)
+        if not playlist:
+            return False
+        if user not in playlist.favorited_by:
+            playlist.favorited_by.append(user)
+            db.commit()
+        return True
+    
+    def unfavorite_playlist(self, db: Session, playlist_id: int, user) -> bool:
+        playlist = self.get_playlist(db, playlist_id)
+        if not playlist:
+            return False
+        if user in playlist.favorited_by:
+            playlist.favorited_by.remove(user)
+            db.commit()
+        return True
+
     def delete_playlist(self, db: Session, playlist_id: int) -> bool:
         db_playlist = self.get_playlist(db, playlist_id)
         if not db_playlist:
@@ -78,5 +94,7 @@ class PlaylistCRUD:
             db.rollback()
             logger.error(f"Error deleting playlist: {str(e)}")
             raise
+        
 
 playlist_crud = PlaylistCRUD()
+

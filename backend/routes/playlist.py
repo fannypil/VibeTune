@@ -27,7 +27,8 @@ async def create_playlist(
 @router.get("/{playlist_id}", response_model=PlaylistOut)
 async def get_playlist(
     playlist_id: int, 
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
 ):
     """Get a playlist by ID"""
     try:
@@ -42,7 +43,12 @@ async def get_playlist(
             )
             
         logger.info(f"Successfully retrieved playlist: {playlist_id}")
-        return playlist
+         # Set is_favorite for this user
+        playlist_out= PlaylistOut.from_orm(playlist)
+        # Manually convert tracks
+        playlist_out.tracks = [TrackOut.from_orm(track) for track in playlist.tracks]
+        playlist_out.is_favorite = current_user in playlist.favorited_by
+        return playlist_out
         
     except HTTPException:
         raise
@@ -161,3 +167,27 @@ async def remove_track_from_playlist(
     except Exception as e:
         logger.error(f"Error removing track: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
+
+@router.post("/{playlist_id}/favorite", status_code=204)
+async def favorite_playlist(
+    playlist_id: int,
+    current_user = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Favorite a playlist"""
+    success = playlist_crud.favorite_playlist(db, playlist_id, current_user)
+    if not success:
+        raise HTTPException(status_code=404, detail="Playlist not found")
+    return
+
+@router.delete("/{playlist_id}/favorite", status_code=204)
+async def unfavorite_playlist(
+    playlist_id: int,
+    current_user = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Unfavorite a playlist"""
+    success = playlist_crud.unfavorite_playlist(db, playlist_id, current_user)
+    if not success:
+        raise HTTPException(status_code=404, detail="Playlist not found")
+    return  
