@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
 from lastfm_client import get_lastfm_top_tracks, search_lastfm_tracks
-from schemas import Track, SearchResponse
+from schemas import TrackBase, SearchResponse
 
 router = APIRouter()
 
@@ -21,7 +21,7 @@ async def lastfm_top_tracks():
     try:
         tracks = get_lastfm_top_tracks()
         simplified_tracks = [
-            Track(
+            TrackBase(
                 name=track.get("name"),
                 artist=track.get("artist", {}).get("name"),
                 url=track.get("url")
@@ -37,7 +37,7 @@ async def search_tracks(q: str = Query(..., description="Song name or artist to 
     try:
         tracks = search_lastfm_tracks(q)
         simplified_tracks = [
-            Track(
+            TrackBase(
                 name=track.get("name"),
                 artist=track.get("artist"),
                 url=track.get("url")

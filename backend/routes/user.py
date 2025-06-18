@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from db.session import get_db
-from db.schemas.user import UserCreate, UserOut
+from schemas.user import UserCreate, UserOut
 from db.crud.user import user_crud
 import logging
 import traceback

@@ -1,5 +1,5 @@
 from typing import Dict, List, Optional
-from schemas import Track, PlaylistCreate, PlaylistResponse, PlaylistUpdate
+from schemas import TrackBase, PlaylistCreate, PlaylistOut, PlaylistUpdate
 from fastapi import HTTPException
 
 
@@ -9,7 +9,7 @@ class PlaylistManager:
         self.playlists: Dict[str, dict] = {}
         self.user_favorites: Dict[str, List[str]] = {}
 
-    async def create_playlist(self, playlist_data: PlaylistCreate, user_id: str) -> PlaylistResponse:
+    async def create_playlist(self, playlist_data: PlaylistCreate, user_id: str) -> PlaylistOut:
         playlist_id = f"playlist_{len(self.playlists) + 1}"  # Temporary ID generation
         playlist = {
             "id": playlist_id,
@@ -18,19 +18,19 @@ class PlaylistManager:
             "user_id": user_id
         }
         self.playlists[playlist_id] = playlist
-        return PlaylistResponse(**playlist)
+        return PlaylistOut(**playlist)
 
-    async def get_playlist(self, playlist_id: str) -> Optional[PlaylistResponse]:
+    async def get_playlist(self, playlist_id: str) -> Optional[PlaylistOut]:
         if playlist_id not in self.playlists:
             return None
-        return PlaylistResponse(**self.playlists[playlist_id])
+        return PlaylistOut(**self.playlists[playlist_id])
 
     async def update_playlist(
         self, 
         playlist_id: str, 
         playlist_update: PlaylistUpdate, 
         user_id: str
-    ) -> Optional[PlaylistResponse]:
+    ) -> Optional[PlaylistOut]:
         if playlist_id not in self.playlists:
             return None
         
@@ -42,7 +42,7 @@ class PlaylistManager:
             "name": playlist_update.name,
             "tracks": playlist_update.tracks or playlist["tracks"]
         })
-        return PlaylistResponse(**playlist)
+        return PlaylistOut(**playlist)
 
     async def like_playlist(self, playlist_id: str, user_id: str) -> bool:
         if playlist_id not in self.playlists:
@@ -55,18 +55,18 @@ class PlaylistManager:
             self.user_favorites[user_id].append(playlist_id)
         return True
 
-    async def get_user_playlists(self, user_id: str) -> List[PlaylistResponse]:
+    async def get_user_playlists(self, user_id: str) -> List[PlaylistOut]:
         return [
-            PlaylistResponse(**playlist)
+            PlaylistOut(**playlist)
             for playlist in self.playlists.values()
             if playlist["user_id"] == user_id
         ]
 
-    async def get_user_favorites(self, user_id: str) -> List[PlaylistResponse]:
+    async def get_user_favorites(self, user_id: str) -> List[PlaylistOut]:
         if user_id not in self.user_favorites:
             return []
         return [
-            PlaylistResponse(**self.playlists[playlist_id])
+            PlaylistOut(**self.playlists[playlist_id])
             for playlist_id in self.user_favorites[user_id]
             if playlist_id in self.playlists
         ]

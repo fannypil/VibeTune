@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
-from schemas.playlist import PlaylistResponse, PlaylistCreate, PlaylistUpdate
+from schemas.playlist import PlaylistOut, PlaylistCreate, PlaylistUpdate
 from routes.auth import get_current_user
 router = APIRouter(prefix="/playlist", tags=["Playlists"])
 
@@ -15,7 +15,7 @@ DUMMY_PLAYLIST = {
     "user_id": "dummy_user_id"
 }
 
-@router.post("/", response_model=PlaylistResponse)
+@router.post("/", response_model=PlaylistOut)
 async def create_playlist(
     playlist: PlaylistCreate,
     current_user = Depends(get_current_user)
@@ -23,12 +23,12 @@ async def create_playlist(
     """Create a dummy playlist"""
     return DUMMY_PLAYLIST
 
-@router.get("/{playlist_id}", response_model=PlaylistResponse)
+@router.get("/{playlist_id}", response_model=PlaylistOut)
 async def get_playlist(playlist_id: str):
     """Get a dummy playlist"""
     return DUMMY_PLAYLIST
 
-@router.put("/{playlist_id}", response_model=PlaylistResponse)
+@router.put("/{playlist_id}", response_model=PlaylistOut)
 async def update_playlist(
     playlist_id: str,
     playlist_update: PlaylistUpdate,
