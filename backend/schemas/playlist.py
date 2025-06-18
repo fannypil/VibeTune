@@ -20,7 +20,7 @@ class PlaylistOut(PlaylistBase):
     id: int
     created_at: datetime
     user_id: int
-    tracks: list[TrackOut] = []
+    tracks: List[TrackOut] = []
 
     class Config:
         orm_mode = True
