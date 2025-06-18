@@ -5,6 +5,7 @@ requests
 pydantic
 typing
 pydantic[email]
+pydantic-settings
 sqlalchemy
 alembic
 python-jose[cryptography]
