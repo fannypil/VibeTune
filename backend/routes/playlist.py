@@ -59,20 +59,6 @@ async def update_playlist(
     current_user = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """
-    Update a playlist by ID
-    
-    Parameters:
-    - playlist_id: ID of the playlist to update
-    - playlist: Updated playlist data
-    
-    Returns:
-    - Updated playlist
-    
-    Raises:
-    - 404: Playlist not found
-    - 403: Not authorized to update this playlist
-    """
     try:
         logger.debug(f"Updating playlist {playlist_id} with data: {playlist}")
         db_playlist = playlist_crud.get_playlist(db, playlist_id)
