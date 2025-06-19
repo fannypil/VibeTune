@@ -25,7 +25,7 @@ class PlaylistOut(PlaylistBase):
     is_favorite: Optional[bool] = None  # Only here, set per-request
 
     class Config:
-        orm_mode = True
+        # orm_mode = True
         from_attributes = True
 
 class SearchResponse(BaseModel):
