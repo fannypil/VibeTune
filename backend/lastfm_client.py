@@ -1,7 +1,7 @@
 import os
 import requests
-# import httpx
-# from typing import List, Dict
+import httpx
+from typing import List, Dict
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -47,6 +47,28 @@ def search_lastfm_tracks(query: str, limit: int = 10):
     else:
         raise Exception(f"Failed to search tracks on Last.fm: {response.text}")
 
-def generate_youtube_search_url(artist, title):
-    query = f"{artist} {title}".replace(" ", "+")
-    return f"https://www.youtube.com/results?search_query={query}"
+# def generate_youtube_search_url(artist, title):
+#     query = f"{artist} {title}".replace(" ", "+")
+#     return f"https://www.youtube.com/results?search_query={query}"
+
+class LastFMClient:
+    def __init__(self, api_key: str = None):
+        self.api_key = api_key or LASTFM_API_KEY
+        self.base_url = BASE_URL
+        if not self.api_key:
+            raise Exception("Missing LASTFM_API_KEY environment variable")
+
+    async def search_tracks(self, keywords: List[str], limit: int = 10) -> List[Dict]:
+        query = " ".join(keywords)
+        params = {
+            "method": "track.search",
+            "track": query,
+            "api_key": self.api_key,
+            "format": "json",
+            "limit": limit
+        }
+        async with httpx.AsyncClient() as client:
+            response = await client.get(self.base_url, params=params)
+            response.raise_for_status()
+            data = response.json()
+            return data.get("results", {}).get("trackmatches", {}).get("track", [])
