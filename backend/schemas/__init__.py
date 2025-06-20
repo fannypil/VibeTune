@@ -3,7 +3,7 @@ from .playlist import (
     PlaylistOut,
     SearchResponse,
     PlaylistCreate,
-    PlaylistUpdate,
+    PlaylistUpdate,PlaylistPromptRequest
     
 )
 from .user import  UserCreate, UserResponse, UserLogin , Token, UserBase, UserOut,TokenData

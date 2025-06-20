@@ -32,3 +32,5 @@ class SearchResponse(BaseModel):
     results: List[TrackBase]
     total: Optional[int] = None
 
+class PlaylistPromptRequest(BaseModel):
+    prompt: str
