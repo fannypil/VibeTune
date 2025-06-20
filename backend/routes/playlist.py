@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, status
-from schemas.playlist import PlaylistOut, PlaylistCreate, PlaylistUpdate
+from schemas.playlist import PlaylistOut, PlaylistCreate, PlaylistUpdate, PlaylistPromptRequest
 from schemas.track import TrackCreate, TrackOut
 from routes.auth import get_current_user
 from db.crud.playlist import PlaylistCRUD, playlist_crud
@@ -8,10 +8,12 @@ from sqlalchemy.orm import Session
 from typing import List
 import logging
 from db.crud.track import TrackCRUD, track_crud
+from ai_agent_client import PlaylistGeneratorService
 
 
 router = APIRouter(prefix="/playlist", tags=["Playlists"])
 logger = logging.getLogger(__name__)
+playlist_generator = PlaylistGeneratorService()
 
 
 @router.post("/", response_model=PlaylistOut, status_code=status.HTTP_201_CREATED)
@@ -191,3 +193,12 @@ async def unfavorite_playlist(
     if not success:
         raise HTTPException(status_code=404, detail="Playlist not found")
     return  
+
+
+@router.post("/generate")
+async def generate_playlist(request: PlaylistPromptRequest):
+    try:
+        result = await playlist_generator.generate_playlist(request.prompt)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
