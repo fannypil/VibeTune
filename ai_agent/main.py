@@ -18,10 +18,16 @@ class MoodAnalysis(BaseModel):
 
 SYSTEM_PROMPT = """You are a music recommendation assistant.
 Analyze the user's input and provide:
-- 3-5 suitable music genres
-- 3-5 mood descriptors
-- 3-5 search keywords for finding matching songs
-Format response as JSON with keys: genres, moods, keywords"""
+, return only a JSON object with the following structure:
+{{
+  "genres": [list of music genres],
+  "moods": [list of mood adjectives],
+  "keywords": [list of relevant keywords]
+}}
+
+User input: {request.prompt}
+Only respond with the JSON. No markdown, no explanation.
+"""
 
 @app.post("/generate", response_model=MoodAnalysis)
 async def generate(request: PromptRequest):
@@ -36,6 +42,7 @@ async def generate(request: PromptRequest):
             raise HTTPException(status_code=500, detail="LLM generation failed")
         response = json.loads(result.stdout)
         return MoodAnalysis(**response)
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

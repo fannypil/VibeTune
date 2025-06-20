@@ -1,5 +1,7 @@
 import os
 import requests
+# import httpx
+# from typing import List, Dict
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,7 +22,6 @@ def get_lastfm_top_tracks(limit=5):
         "format": "json",
         "limit": limit
     }
-
     response = requests.get(url, params=params)
     if response.status_code != 200:
         raise Exception(f"Failed to fetch data from Last.fm: {response.text}")
