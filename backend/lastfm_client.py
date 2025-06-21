@@ -47,10 +47,6 @@ def search_lastfm_tracks(query: str, limit: int = 10):
     else:
         raise Exception(f"Failed to search tracks on Last.fm: {response.text}")
 
-# def generate_youtube_search_url(artist, title):
-#     query = f"{artist} {title}".replace(" ", "+")
-#     return f"https://www.youtube.com/results?search_query={query}"
-
 class LastFMClient:
     def __init__(self, api_key: str = None):
         self.api_key = api_key or LASTFM_API_KEY
@@ -71,4 +67,26 @@ class LastFMClient:
             response = await client.get(self.base_url, params=params)
             response.raise_for_status()
             data = response.json()
+            print("Last.fm query:", query)
+            print("Last.fm response:", data)
             return data.get("results", {}).get("trackmatches", {}).get("track", [])
+    
+    async def get_top_tracks_by_tags(self, tags: list, limit: int = 10) -> list:
+        tracks = []
+        async with httpx.AsyncClient() as client:
+            for tag in tags:
+                params = {
+                    "method": "tag.gettoptracks",
+                    "tag": tag,
+                    "api_key": self.api_key,
+                    "format": "json",
+                    "limit": limit
+                }
+                response = await client.get(self.base_url, params=params)
+                response.raise_for_status()
+                data = response.json()
+                tag_tracks = data.get("tracks", {}).get("track", [])
+                for track in tag_tracks:
+                    track["source_tag"] = tag  # for later filtering/prioritization
+                tracks.extend(tag_tracks)
+        return tracks
