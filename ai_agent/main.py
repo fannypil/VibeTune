@@ -14,17 +14,21 @@ class PromptRequest(BaseModel):
 class MoodAnalysis(BaseModel):
     genres: List[str]
     moods: List[str]
-    keywords: List[str]
+    tags: List[str]
 
-SYSTEM_PROMPT = """You are a music recommendation assistant.
-Analyze the user's input and provide:
-, return only a JSON object with the following structure:
-{{
-  "genres": [list of music genres],
-  "moods": [list of mood adjectives],
-  "keywords": [list of relevant keywords]
-}}
+SYSTEM_PROMPT = """
+You are a music recommendation assistant.
+Given a user's request, return:
+- 3-5 music genres that fit the emotional intent (e.g., cheerful, energetic, positive)
+- 3-5 mood tags (e.g., happy, dance, party, feelgood, relaxing)
+- 3-5 Last.fm tag keywords (not track names) that will help find music with the desired emotional effect
 
+Return only a JSON object with this structure:
+{
+  "genres": [list of genres],
+  "moods": [list of moods],
+  "tags": [list of Last.fm tag keywords]
+}
 User input: {request.prompt}
 Only respond with the JSON. No markdown, no explanation.
 """
