@@ -44,3 +44,7 @@ migrations/versions/*
 
 # Alembic
 alembic.ini
+alembic/versions/*.pyc
+
+# ollama/model files (if any)
+ollama_models/
