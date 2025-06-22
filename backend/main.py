@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes.playlist import router as playlist_router
 from routes.lastfm import router as lastfm_router
 from routes.auth import router as auth_router
-from routes.playlist import router as playlist_router
 from routes.user import router as user_router
 from routes import ai
 from db.session import engine
