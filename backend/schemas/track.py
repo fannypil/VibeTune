@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 class TrackBase(BaseModel):
     name: str
@@ -16,3 +16,17 @@ class TrackOut(TrackBase):
     class Config:
         # orm_mode = True
         from_attributes = True
+        
+class Track(BaseModel):
+    title: str
+    artist: str
+    url: Optional[str]
+    listeners: Optional[int]
+    image: Optional[str]
+
+class LLMResponseItem(BaseModel):
+    title: str
+    artist: str
+
+class LLMResponse(BaseModel):
+    songs: List[LLMResponseItem]

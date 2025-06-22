@@ -1,8 +1,8 @@
 import os
 import requests
-import httpx
-from typing import List, Dict
+from typing import Optional
 from dotenv import load_dotenv
+from schemas.track import Track
 
 load_dotenv()
 
@@ -46,7 +46,8 @@ def search_lastfm_tracks(query: str, limit: int = 10):
         return tracks
     else:
         raise Exception(f"Failed to search tracks on Last.fm: {response.text}")
-
+    
+    
 class LastFMClient:
     def __init__(self, api_key: str = None):
         self.api_key = api_key or LASTFM_API_KEY
@@ -54,39 +55,25 @@ class LastFMClient:
         if not self.api_key:
             raise Exception("Missing LASTFM_API_KEY environment variable")
 
-    async def search_tracks(self, keywords: List[str], limit: int = 10) -> List[Dict]:
-        query = " ".join(keywords)
+    async def search_tracks(self, title: str, artist: str) -> Optional[Track]:
         params = {
             "method": "track.search",
-            "track": query,
+            "track": title,
+            "artist": artist,
             "api_key": self.api_key,
             "format": "json",
-            "limit": limit
+            "limit": 1,
         }
-        async with httpx.AsyncClient() as client:
-            response = await client.get(self.base_url, params=params)
-            response.raise_for_status()
-            data = response.json()
-            print("Last.fm query:", query)
-            print("Last.fm response:", data)
-            return data.get("results", {}).get("trackmatches", {}).get("track", [])
-    
-    async def get_top_tracks_by_tags(self, tags: list, limit: int = 10) -> list:
-        tracks = []
-        async with httpx.AsyncClient() as client:
-            for tag in tags:
-                params = {
-                    "method": "tag.gettoptracks",
-                    "tag": tag,
-                    "api_key": self.api_key,
-                    "format": "json",
-                    "limit": limit
-                }
-                response = await client.get(self.base_url, params=params)
-                response.raise_for_status()
-                data = response.json()
-                tag_tracks = data.get("tracks", {}).get("track", [])
-                for track in tag_tracks:
-                    track["source_tag"] = tag  # for later filtering/prioritization
-                tracks.extend(tag_tracks)
-        return tracks
+        response = requests.get(self.base_url, params=params)  # <-- FIXED HERE
+        data = response.json()
+        try:
+            track_data = data["results"]["trackmatches"]["track"][0]
+            return Track(
+                title=track_data["name"],
+                artist=track_data["artist"],
+                url=track_data.get("url"),
+                listeners=int(track_data.get("listeners", 0)),
+                image=track_data["image"][-1]["#text"] if track_data.get("image") else None
+            )
+        except (IndexError, KeyError):
+            return None

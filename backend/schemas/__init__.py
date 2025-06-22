@@ -1,4 +1,4 @@
-from .track import TrackBase
+from .track import TrackBase, Track
 from .playlist import (
     PlaylistOut,
     SearchResponse,
