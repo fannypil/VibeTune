@@ -3,7 +3,8 @@ from .playlist import (
     PlaylistOut,
     SearchResponse,
     PlaylistCreate,
-    PlaylistUpdate,PlaylistPromptRequest
+    PlaylistUpdate,PlaylistPromptRequest, 
+    PlaylistBase
     
 )
 from .user import  UserCreate, UserResponse, UserLogin , Token, UserBase, UserOut,TokenData
@@ -19,3 +20,4 @@ __all__ = [
     "PlaylistCreate",
     "PlaylistOut"
 ]
+from .artist import Artist

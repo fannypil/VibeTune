@@ -10,8 +10,8 @@ LASTFM_API_KEY = os.getenv("LASTFM_API_KEY")
 BASE_URL = "http://ws.audioscrobbler.com/2.0/"
 
 
-def get_lastfm_top_tracks(limit=5):
-    api_key = os.getenv("LASTFM_API_KEY")
+def get_lastfm_top_tracks(limit=15):
+    api_key = LASTFM_API_KEY
     if not api_key:
         raise Exception("Missing LASTFM_API_KEY environment variable")
 
@@ -28,6 +28,25 @@ def get_lastfm_top_tracks(limit=5):
 
     data = response.json()
     return data.get("tracks", {}).get("track", [])
+
+def get_lastfm_top_artists(limit=10):
+    api_key = LASTFM_API_KEY
+    if not api_key:
+        raise Exception("Missing LASTFM_API_KEY environment variable")
+
+    url = "http://ws.audioscrobbler.com/2.0/"
+    params = {
+        "method": "chart.gettopartists",
+        "api_key": api_key,
+        "format": "json",
+        "limit": limit
+    }
+    response = requests.get(url, params=params)
+    if response.status_code != 200:
+        raise Exception(f"Failed to fetch data from Last.fm: {response.text}")
+
+    data = response.json()
+    return data.get("artists", {}).get("artist", [])
 
 def search_lastfm_tracks(query: str, limit: int = 10):
     api_key = os.getenv("LASTFM_API_KEY")
