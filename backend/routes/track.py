@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
+import logging
+from youtube_client import search_youtube_video
 from db.crud.playlist import playlist_crud
 from db.crud.track import track_crud
 from db.session import get_db
 from schemas.track import TrackCreate, TrackOut
 from routes.auth import get_current_user
-import logging
 
 
 router = APIRouter(prefix="/track", tags=["Track"])
@@ -67,3 +68,11 @@ async def remove_track_from_playlist(
     except Exception as e:
         logger.error(f"Error removing track: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
+    
+@router.get("/youtube-track")
+async def get_youtube_video(track_title: str = Query(...), artist: str = Query(...)):
+    query = f"{track_title} {artist}"
+    video_id = search_youtube_video(query)
+    if not video_id:
+        raise HTTPException(status_code=404, detail="Video not found")
+    return {"video_id": video_id}
