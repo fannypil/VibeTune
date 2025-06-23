@@ -3,12 +3,10 @@ from schemas.playlist import PlaylistOut, PlaylistCreate, PlaylistUpdate, Playli
 from schemas.track import TrackCreate, TrackOut
 from routes.auth import get_current_user
 from db.crud.playlist import  playlist_crud
-# from db.crud.playlist import PlaylistCRUD
 from db.session import get_db
 from sqlalchemy.orm import Session
 from typing import List
 import logging
-# from db.crud.track import TrackCRUD, track_crud
 
 
 router = APIRouter(prefix="/playlist", tags=["Playlists"])
@@ -30,8 +28,34 @@ async def get_my_playlists(
     current_user = Depends(get_current_user)
 ):
     playlists = playlist_crud.get_user_playlists(db, current_user.id)
-    return playlists
+    return [
+        PlaylistSummary(
+            id=playlist.id,
+            name=playlist.name,
+            description=playlist.description,
+            created_at=playlist.created_at,
+            is_favorite=current_user in getattr(playlist, "favorited_by", [])
+        )
+        for playlist in playlists
+    ]
 
+@router.get("/favorites", response_model=List[PlaylistSummary])
+async def get_favorite_playlists(
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """Get all playlists favorited by the current user"""
+    playlists = playlist_crud.get_my_favorite_playlists(db, current_user.id)
+    return [
+    PlaylistSummary(
+        id=playlist.id,
+        name=playlist.name,
+        description=playlist.description,
+        created_at=playlist.created_at,
+        is_favorite=True
+    )
+    for playlist in playlists
+]
 
 @router.get("/{playlist_id}", response_model=PlaylistOut)
 async def get_playlist(

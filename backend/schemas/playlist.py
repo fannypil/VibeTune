@@ -13,7 +13,6 @@ class PlaylistCreate(PlaylistBase):
 
 class PlaylistUpdate(PlaylistBase):
     name: Optional[str] = Field(None, min_length=1, max_length=100)
-    # is_favorite: Optional[bool] = None
     tracks: Optional[List[TrackBase]] = None
 
 class PlaylistOut(PlaylistBase):

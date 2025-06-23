@@ -29,6 +29,7 @@ class PlaylistCRUD:
             db.rollback()
             logger.error(f"Error creating playlist: {str(e)}", exc_info=True)
             raise
+        
     def get_playlist(self, db: Session, playlist_id: int) -> Optional[Playlist]:
         try:
             logger.debug(f"Attempting to fetch playlist with ID: {playlist_id}")
@@ -80,6 +81,9 @@ class PlaylistCRUD:
             playlist.favorited_by.remove(user)
             db.commit()
         return True
+    
+    def get_my_favorite_playlists(seld,db: Session, user_id: int):
+        return db.query(Playlist).filter(Playlist.favorited_by.any(id=user_id)).all()
 
     def delete_playlist(self, db: Session, playlist_id: int) -> bool:
         db_playlist = self.get_playlist(db, playlist_id)
