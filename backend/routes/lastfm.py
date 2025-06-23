@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
-from lastfm_client import get_lastfm_top_tracks, search_lastfm_tracks, get_lastfm_top_artists
-from schemas import TrackBase, SearchResponse, Artist
+from lastfm_client import get_lastfm_top_tracks, search_lastfm_tracks, get_lastfm_top_artists, get_tracks_by_tags
+from schemas import TrackBase, SearchResponse, Artist, Track
 from typing import List
 
 router = APIRouter()
@@ -73,5 +73,22 @@ async def lastfm_top_artists():
 
         return artists
 
+    except Exception as e:
+        return {"error": str(e)}
+    
+@router.get("/genre/{tag_name}", response_model=List[Track])
+async def get_tracks_for_genre(tag_name: str, limit: int = Query(20, le=50)):
+    try:
+        raw_tracks = get_tracks_by_tags(tag_name, limit)
+        return [
+            Track(
+                title=t["name"],
+                artist=t["artist"]["name"],
+                url=t.get("url"),
+                listeners=int(t.get("listeners", 0)),
+                image=t["image"][-1]["#text"] if t.get("image") else None
+            )
+            for t in raw_tracks
+        ]
     except Exception as e:
         return {"error": str(e)}

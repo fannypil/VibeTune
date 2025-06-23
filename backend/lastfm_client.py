@@ -3,6 +3,7 @@ import requests
 from typing import Optional
 from dotenv import load_dotenv
 from schemas.track import Track
+import random
 
 load_dotenv()
 
@@ -15,14 +16,14 @@ def get_lastfm_top_tracks(limit=15):
     if not api_key:
         raise Exception("Missing LASTFM_API_KEY environment variable")
 
-    url = "http://ws.audioscrobbler.com/2.0/"
+    # url = "http://ws.audioscrobbler.com/2.0/"
     params = {
         "method": "chart.gettoptracks",
         "api_key": api_key,
         "format": "json",
         "limit": limit
     }
-    response = requests.get(url, params=params)
+    response = requests.get(BASE_URL, params=params)
     if response.status_code != 200:
         raise Exception(f"Failed to fetch data from Last.fm: {response.text}")
 
@@ -34,14 +35,14 @@ def get_lastfm_top_artists(limit=10):
     if not api_key:
         raise Exception("Missing LASTFM_API_KEY environment variable")
 
-    url = "http://ws.audioscrobbler.com/2.0/"
+    # url = "http://ws.audioscrobbler.com/2.0/"
     params = {
         "method": "chart.gettopartists",
         "api_key": api_key,
         "format": "json",
         "limit": limit
     }
-    response = requests.get(url, params=params)
+    response = requests.get(BASE_URL, params=params)
     if response.status_code != 200:
         raise Exception(f"Failed to fetch data from Last.fm: {response.text}")
 
@@ -49,8 +50,8 @@ def get_lastfm_top_artists(limit=10):
     return data.get("artists", {}).get("artist", [])
 
 def search_lastfm_tracks(query: str, limit: int = 10):
-    api_key = os.getenv("LASTFM_API_KEY")
-    url = f"http://ws.audioscrobbler.com/2.0/"
+    api_key = LASTFM_API_KEY
+    # url = f"http://ws.audioscrobbler.com/2.0/"
     params = {
         "method": "track.search",
         "track": query,
@@ -58,13 +59,33 @@ def search_lastfm_tracks(query: str, limit: int = 10):
         "format": "json",
         "limit": limit
     }
-    response = requests.get(url, params=params)
+    response = requests.get(BASE_URL, params=params)
     if response.status_code == 200:
         data = response.json()
         tracks = data.get("results", {}).get("trackmatches", {}).get("track", [])
         return tracks
     else:
         raise Exception(f"Failed to search tracks on Last.fm: {response.text}")
+    
+def get_tracks_by_tags(tag: str, limit: int = 20, page: int = None):
+    if not page:
+        page = random.randint(1, 5)
+    
+    params = {
+        "method": "tag.getTopTracks",
+        "tag": tag,
+        "limit": limit,
+        "page": page,
+        "api_key": LASTFM_API_KEY,
+        "format": "json"
+    }
+
+    response = requests.get(BASE_URL, params=params)
+    if response.status_code != 200:
+        raise Exception(f"Error fetching genre tracks: {response.text}")
+    
+    data = response.json()
+    return data.get("tracks", {}).get("track", [])
     
     
 class LastFMClient:
