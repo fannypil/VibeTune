@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, status
-from schemas.playlist import PlaylistOut, PlaylistCreate, PlaylistUpdate, PlaylistPromptRequest
+from schemas.playlist import PlaylistOut, PlaylistCreate, PlaylistUpdate, PlaylistSummary
 from schemas.track import TrackCreate, TrackOut
 from routes.auth import get_current_user
 from db.crud.playlist import PlaylistCRUD, playlist_crud
@@ -22,6 +22,14 @@ async def create_playlist(
 ):
     """Create a new playlist"""
     return playlist_crud.create_playlist(db=db, playlist=playlist, user_id=current_user.id)
+
+@router.get("/my-playlists", response_model=List[PlaylistSummary])
+async def get_my_playlists(
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    playlists = playlist_crud.get_user_playlists(db, current_user.id)
+    return playlists
 
 
 @router.get("/{playlist_id}", response_model=PlaylistOut)
@@ -191,3 +199,4 @@ async def unfavorite_playlist(
     if not success:
         raise HTTPException(status_code=404, detail="Playlist not found")
     return  
+

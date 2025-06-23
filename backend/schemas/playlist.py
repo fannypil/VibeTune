@@ -7,7 +7,6 @@ from datetime import datetime
 class PlaylistBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     description: Optional[str] = Field(None, max_length=500)
-    # is_favorite: bool = False
 
 class PlaylistCreate(PlaylistBase):
     tracks: List[TrackBase] = []
@@ -25,7 +24,6 @@ class PlaylistOut(PlaylistBase):
     is_favorite: Optional[bool] = None  # Only here, set per-request
 
     class Config:
-        # orm_mode = True
         from_attributes = True
 
 class SearchResponse(BaseModel):
@@ -34,3 +32,11 @@ class SearchResponse(BaseModel):
 
 class PlaylistPromptRequest(BaseModel):
     prompt: str
+
+class PlaylistSummary(PlaylistBase):
+    id: int
+    created_at: datetime
+    is_favorite: Optional[bool] = None  # Only here, set per-request
+
+    class Config:
+        from_attributes = True

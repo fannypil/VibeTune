@@ -4,7 +4,7 @@ from .playlist import (
     SearchResponse,
     PlaylistCreate,
     PlaylistUpdate,PlaylistPromptRequest, 
-    PlaylistBase
+    PlaylistBase, PlaylistSummary
     
 )
 from .user import  UserCreate, UserResponse, UserLogin , Token, UserBase, UserOut,TokenData
