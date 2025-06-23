@@ -21,3 +21,4 @@ __all__ = [
     "PlaylistOut"
 ]
 from .artist import Artist
+from .quiz import QuizRequest

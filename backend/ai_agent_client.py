@@ -1,6 +1,7 @@
 import httpx
 from typing import Dict
 import logging
+from schemas.quiz import QuizRequest
 
 logger = logging.getLogger(__name__)
 
@@ -17,3 +18,20 @@ class AIAgentClient:
             response.raise_for_status()
             return response.json()
         
+def build_prompt_from_quiz(data: QuizRequest) -> str:
+    genre_text = ", ".join(data.preferred_genres)
+    discovery_text = {
+        "popular": "well-known and beloved hits",
+        "fresh": "lesser-known or recently released songs",
+        "mix": "a mix of popular and fresh tracks"
+    }.get(data.discovery_mode, "a variety of tracks")
+    decade_text = f"songs from the {data.decade}" if data.decade else "songs from all decades"
+
+
+    prompt = (
+        f"I'm feeling {data.mood} and I'm about to {data.activity}. "
+        f"I love {genre_text} music, especially {decade_text}. "
+        f"Please recommend 10-12 songs that match this vibe, focusing on {discovery_text}. "
+        "Only return a JSON array with song title and artist."
+    )
+    return prompt
