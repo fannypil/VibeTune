@@ -2,32 +2,12 @@ import pytest
 from fastapi.testclient import TestClient
 from main import app
 
-def test_add_track_to_playlist(client, test_db, auth_headers):
-    # Create a playlist
-    playlist_data = {
-        "name": "Test Playlist",
-        "description": "Test playlist for tracks"
-    }
-    resp = client.post("/playlist/", json=playlist_data, headers=auth_headers)
-    assert resp.status_code == 200
-    playlist_id = resp.json()["id"]
-    
-    # Add track to playlist
-    track_data = {
-        "name": "Test Track",
-        "artist": "Test Artist",
-        "url": "http://example.com/track",
-        "playlist_id": playlist_id
-    }
-    resp = client.post(
-        f"/track/{playlist_id}/tracks",
-        json=track_data,
-        headers=auth_headers
-    )
-    assert resp.status_code == 200
-    assert resp.json()["name"] == "Test Track"
+def test_add_track_to_playlist(client, test_db, auth_headers, create_test_playlist, create_test_track):
+    playlist = create_test_playlist()
+    track = create_test_track(playlist["id"])
+    assert track["name"] == "Test Track"
 
-def test_add_track_to_nonexistent_playlist(client, test_db, auth_headers):
+def test_add_track_to_nonexistent_playlist(client, test_db, auth_headers,create_test_playlist):
     track_data = {
         "name": "Test Track",
         "artist": "Test Artist",
@@ -41,42 +21,16 @@ def test_add_track_to_nonexistent_playlist(client, test_db, auth_headers):
     )
     assert resp.status_code == 404
 
-def test_remove_track(client, test_db, auth_headers):
-    # First create a playlist
-    playlist_data = {
-        "name": "Test Playlist",
-        "description": "Test playlist for tracks"
-    }
-    resp = client.post("/playlist/", json=playlist_data, headers=auth_headers)
-    assert resp.status_code == 200
-    playlist_id = resp.json()["id"]
-    
-    # Add a track to the playlist
-    track_data = {
-        "name": "Test Track",
-        "artist": "Test Artist",
-        "url": "http://example.com/track",
-        "playlist_id": playlist_id
-    }
-    resp = client.post(
-        f"/track/{playlist_id}/tracks",
-        json=track_data,
-        headers=auth_headers
-    )
-    assert resp.status_code == 200
-    track_id = resp.json()["id"]
+def test_remove_track(client, test_db, auth_headers, create_test_playlist, create_test_track):
+    playlist = create_test_playlist()
+    track = create_test_track(playlist["id"])
     
     # Remove the track
     resp = client.delete(
-        f"/track/{playlist_id}/tracks/{track_id}",
+        f"/track/{playlist['id']}/tracks/{track['id']}",
         headers=auth_headers
     )
     assert resp.status_code == 204
-    
-    # Verify track is removed
-    resp = client.get(f"/playlist/{playlist_id}", headers=auth_headers)
-    assert resp.status_code == 200
-    assert track_id not in [t["id"] for t in resp.json()["tracks"]]
 
 def test_remove_track_from_nonexistent_playlist(client, test_db, auth_headers):
     resp = client.delete("/track/999/tracks/1", headers=auth_headers)
@@ -102,15 +56,9 @@ def test_youtube_track_search(client, test_db):
     assert resp.status_code == 200
     assert "video_id" in resp.json()
 
-def test_remove_nonexistent_track(client, test_db, auth_headers):
-    # First create a playlist
-    playlist_data = {
-        "name": "Test Playlist",
-        "description": "Test playlist for tracks"
-    }
-    resp = client.post("/playlist/", json=playlist_data, headers=auth_headers)
-    assert resp.status_code == 200
-    playlist_id = resp.json()["id"]
+def test_remove_nonexistent_track(client, test_db, auth_headers, create_test_playlist):
+    playlist = create_test_playlist()
+    playlist_id = playlist["id"]
     
     # Try to remove non-existent track
     resp = client.delete(

@@ -70,3 +70,34 @@ def auth_headers(client, test_db):
     token = login.json()["access_token"]
     
     return {"Authorization": f"Bearer {token}"}
+
+@pytest.fixture
+def create_test_playlist(client, auth_headers):
+    def _create_playlist(name="Test Playlist", description="Test playlist description"):
+        playlist_data = {
+            "name": name,
+            "description": description,
+            "tracks": []
+        }
+        resp = client.post("/playlist/", json=playlist_data, headers=auth_headers)
+        assert resp.status_code == 200
+        return resp.json()
+    return _create_playlist
+
+@pytest.fixture
+def create_test_track(client, auth_headers):
+    def _create_track(playlist_id, name="Test Track", artist="Test Artist"):
+        track_data = {
+            "name": name,
+            "artist": artist,
+            "url": "http://example.com/track",
+            "playlist_id": playlist_id
+        }
+        resp = client.post(
+            f"/track/{playlist_id}/tracks",
+            json=track_data,
+            headers=auth_headers
+        )
+        assert resp.status_code == 200
+        return resp.json()
+    return _create_track
