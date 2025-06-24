@@ -9,6 +9,7 @@ __pycache__/
 .coverage
 htmlcov/
 
+
 # Virtual Environments
 venv/
 env/
@@ -48,3 +49,21 @@ alembic/versions/*.pyc
 
 # ollama/model files (if any)
 ollama_models/
+
+# Testing
+.pytest_cache/
+.coverage
+coverage.xml
+.tox/
+.nox/
+nosetests.xml
+coverage/
+.hypothesis/
+.coveragerc
+*,cover
+*.pyc
+reports/
+test-reports/
+junit.xml
+.testmondata
+.tmontmp
