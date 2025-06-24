@@ -1,0 +1,48 @@
+import pytest
+from sqlalchemy import create_engine, inspect
+from sqlalchemy.orm import sessionmaker
+from fastapi.testclient import TestClient
+from main import app
+from db.models import User, Track, Playlist, Base
+from db.session import get_db
+
+# Use SQLite in-memory database for testing
+SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+
+@pytest.fixture(scope="session")
+def engine():
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        connect_args={"check_same_thread": False}
+    )
+    # Create all tables before running tests
+    Base.metadata.create_all(bind=engine)
+    
+    yield engine
+    
+    # Drop all tables after tests
+    Base.metadata.drop_all(bind=engine)
+
+@pytest.fixture(scope="function")
+def db_session(engine):
+    connection = engine.connect()
+    transaction = connection.begin()
+    SessionLocal = sessionmaker(bind=connection)
+    session = SessionLocal()
+
+    yield session
+
+    session.close()
+    transaction.rollback()
+    connection.close()
+
+@pytest.fixture
+def client(db_session):
+    app.dependency_overrides[get_db] = lambda: db_session
+    with TestClient(app) as test_client:
+        yield test_client
+    app.dependency_overrides.clear()
+
+@pytest.fixture
+def test_db(db_session):
+    yield db_session
