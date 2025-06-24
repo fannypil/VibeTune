@@ -12,6 +12,7 @@ services:
       ai_agent:
         condition: service_healthy
     volumes:
+    - ./backend:/app 
       - db_data:/app
 
   frontend:
