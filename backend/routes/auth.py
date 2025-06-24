@@ -24,13 +24,21 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
     try:
         logger.debug(f"Registration attempt for email: {user.email}")
         
-        # Check for existing user
+        # Check for existing email
         db_user = user_crud.get_user_by_email(db, user.email)
         if db_user:
             logger.warning(f"Email already registered: {user.email}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already registered"
+            )
+        # Check for existing username
+        db_user = user_crud.get_user_by_username(db, user.username)
+        if db_user:
+            logger.warning(f"Username already registered: {user.username}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username already registered"
             )
         
         # Create new user
