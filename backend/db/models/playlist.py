@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, UTC
 from .base import Base
 
 class Playlist(Base):
@@ -10,7 +10,7 @@ class Playlist(Base):
     name = Column(String, index=True)
     description = Column(String, nullable=True)
     # is_favorite = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     user_id = Column(Integer, ForeignKey("users.id"))
 
     # Relationships

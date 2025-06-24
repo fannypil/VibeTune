@@ -46,3 +46,27 @@ def client(db_session):
 @pytest.fixture
 def test_db(db_session):
     yield db_session
+
+# ...existing code...
+
+@pytest.fixture
+def auth_headers(client, test_db):
+    # Create test user
+    resp = client.post("/auth/register", json={
+        "username": "trackuser",
+        "email": "track@example.com",
+        "first_name": "Track",
+        "last_name": "User",
+        "password": "Password123"
+    })
+    assert resp.status_code == 200
+    
+    # Login and get token
+    login = client.post("/auth/login", data={
+        "username": "track@example.com",
+        "password": "Password123"
+    })
+    assert login.status_code == 200
+    token = login.json()["access_token"]
+    
+    return {"Authorization": f"Bearer {token}"}

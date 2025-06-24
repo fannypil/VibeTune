@@ -13,14 +13,20 @@ router = APIRouter(prefix="/playlist", tags=["Playlists"])
 logger = logging.getLogger(__name__)
 
 
-@router.post("/", response_model=PlaylistOut, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=PlaylistOut)
 async def create_playlist(
     playlist: PlaylistCreate,
     current_user = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Create a new playlist"""
-    return playlist_crud.create_playlist(db=db, playlist=playlist, user_id=current_user.id)
+    try:
+        # Add user_id to playlist data
+        return playlist_crud.create_playlist(db, playlist, current_user.id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
 
 @router.get("/my-playlists", response_model=List[PlaylistSummary])
 async def get_my_playlists(
