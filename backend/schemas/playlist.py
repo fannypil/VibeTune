@@ -26,7 +26,7 @@ class PlaylistOut(PlaylistBase):
 
 class SearchResponse(BaseModel):
     results: List[TrackBase]
-    total: Optional[int] = None
+    error: Optional[str] = None
 
 class PlaylistPromptRequest(BaseModel):
     prompt: str

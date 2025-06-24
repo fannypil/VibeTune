@@ -31,7 +31,7 @@ async def lastfm_top_tracks():
         ]
         return {"results": simplified_tracks}
     except Exception as e:
-        return {"error": str(e)}
+        return {"results": [], "error": str(e)}
 
 @router.get("/search", response_model=SearchResponse)
 async def search_tracks(q: str = Query(..., description="Song name or artist to search")):
