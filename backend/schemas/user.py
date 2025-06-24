@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 from .playlist import PlaylistOut
@@ -13,7 +13,8 @@ class UserBase(BaseModel):
     last_name: str = Field(..., min_length=1,
                            description="Last name is required")
     
-    @validator('email')
+    @field_validator('email')
+    @classmethod
     def email_must_be_valid(cls, v):
         if not v:
             raise ValueError('Email address is required')
@@ -22,7 +23,8 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str = Field(..., min_length=8,
                            description="Password must be at least 8 characters long")
-    @validator('password')
+    @field_validator('password')
+    @classmethod
     def password_strength(cls, v):
         if not any(char.isdigit() for char in v):
             raise ValueError("Password must contain at least one number")
@@ -35,9 +37,7 @@ class UserOut(UserBase):
     playlists: List[PlaylistOut] = []
     favorites: List[PlaylistOut] = []
     
-    class Config:
-        # orm_mode = True
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class UserResponse(UserBase):
     id: int

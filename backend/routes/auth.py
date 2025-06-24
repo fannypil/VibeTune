@@ -38,7 +38,11 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
         logger.info(f"Successfully registered user with ID: {new_user.id}")
         return new_user
         
+    except HTTPException as he:
+        # Re-raise HTTP exceptions as-is
+        raise he
     except Exception as e:
+        # Log unexpected errors and return 500
         logger.error(f"Registration failed: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
