@@ -71,8 +71,12 @@ async def remove_track_from_playlist(
     
 @router.get("/youtube-track")
 async def get_youtube_video(track_title: str = Query(...), artist: str = Query(...)):
-    query = f"{track_title} {artist}"
-    video_id = search_youtube_video(query)
-    if not video_id:
-        raise HTTPException(status_code=404, detail="Video not found")
-    return {"video_id": video_id}
+    try:
+        query = f"{track_title} {artist}"
+        video_id = search_youtube_video(query)
+        if not video_id:
+            return {"error": "Video not found"}
+        return {"video_id": video_id}
+    except Exception as e:
+        logger.error(f"YouTube search error: {str(e)}")
+        return {"error": str(e)}
