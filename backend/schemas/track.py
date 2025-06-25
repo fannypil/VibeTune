@@ -21,8 +21,8 @@ class Track(BaseModel):
     title: str
     artist: str
     url: Optional[str]
-    listeners: Optional[int]
     image: Optional[str]
+    listeners: Optional[int] =None
 
 class LLMResponseItem(BaseModel):
     title: str

@@ -4,6 +4,7 @@ from typing import Optional
 from dotenv import load_dotenv
 from schemas.track import Track
 import random
+import logging
 
 load_dotenv()
 
@@ -85,8 +86,7 @@ def get_tracks_by_tags(tag: str, limit: int = 20, page: int = None):
         raise Exception(f"Error fetching genre tracks: {response.text}")
     
     data = response.json()
-    return data.get("tracks", {}).get("track", [])
-    
+    return data.get("tracks", {}).get("track", [])  
     
 class LastFMClient:
     def __init__(self, api_key: str = None):
