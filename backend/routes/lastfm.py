@@ -88,7 +88,7 @@ async def get_tracks_for_genre(tag_name: str, limit: int = Query(20, le=50)):
                 artist=t["artist"]["name"],
                 url=t.get("url"),
                 image=t["image"][-1]["#text"] if t.get("image") else None,
-                listeners=None
+                # listeners=None
             )
             for t in raw_tracks
         ]

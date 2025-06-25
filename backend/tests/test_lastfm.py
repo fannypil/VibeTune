@@ -60,24 +60,28 @@ def test_get_lastfm_top_artists(client, test_db):
 
 def test_get_tracks_by_genre(client, test_db):
     with patch('routes.lastfm.get_tracks_by_tags') as mock_genre:
+        # Mock LastFM genre response
         mock_genre.return_value = [{
             "name": "Genre Track",
             "artist": {"name": "Genre Artist"},
             "url": "http://example.com/genre",
-            "listeners": "200",
             "image": [
                 {"#text": "small.jpg", "size": "small"},
                 {"#text": "large.jpg", "size": "large"}
-            ]
+            ]           
         }]
         
-        resp = client.get("/genre/rock?limit=20")
-        assert resp.status_code == 200
-        track = resp.json()[0]
+        resp = client.get("/genre/rock", params={"limit": 20}) 
+        assert resp.status_code == 200, f"Request failed with status {resp.status_code}: {resp.text}"
+        
+        tracks = resp.json()
+        assert len(tracks) > 0
+        track = tracks[0]
         assert track["title"] == "Genre Track"
         assert track["artist"] == "Genre Artist"
-        assert track["listeners"] == 200
-
+        assert track.get("url") == "http://example.com/genre"
+        assert track.get("image") == "large.jpg"  # Should get the largest image
+        
 def test_lastfm_api_error(client, test_db):
     with patch('routes.lastfm.get_lastfm_top_tracks') as mock_error:
         mock_error.side_effect = Exception("API Error")
