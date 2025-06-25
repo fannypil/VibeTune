@@ -16,3 +16,5 @@ jose
 httpx
 pytest
 pytest-asyncio
+pytest-aiohttp
+aiohttp
