@@ -86,7 +86,8 @@ def get_tracks_by_tags(tag: str, limit: int = 20, page: int = None):
         raise Exception(f"Error fetching genre tracks: {response.text}")
     
     data = response.json()
-    return data.get("tracks", {}).get("track", [])  
+    tracks = data.get("tracks", {}).get("track", [])
+    return tracks[:limit] 
     
 class LastFMClient:
     def __init__(self, api_key: str = None):

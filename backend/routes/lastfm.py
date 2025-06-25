@@ -82,16 +82,17 @@ async def lastfm_top_artists():
 async def get_tracks_for_genre(tag_name: str, limit: int = Query(20, le=50)):
     try:
         raw_tracks = get_tracks_by_tags(tag_name, limit)
-        return [
-             Track(
+        tracks = [
+            Track(
                 title=t["name"],
                 artist=t["artist"]["name"],
                 url=t.get("url"),
                 image=t["image"][-1]["#text"] if t.get("image") else None,
-                listeners=None  # No longer try to get listeners
+                listeners=None
             )
             for t in raw_tracks
         ]
+        return tracks[:limit]
     except Exception as e:
         logger.warning(f"Error getting tracks for genre {tag_name}: {str(e)}")
         return []
