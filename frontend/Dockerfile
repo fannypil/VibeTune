@@ -1,11 +1,24 @@
-# Use a lightweight Nginx image to serve a placeholder page
-FROM nginx:stable-alpine
+FROM node:20-alpine
 
-# Copy a simple placeholder HTML file to the Nginx HTML directory
-RUN echo "<h1>Frontend is under construction</h1>" > /usr/share/nginx/html/index.html
+WORKDIR /app
 
-# Expose the port Nginx will serve on
-EXPOSE 80
+# Copy package files first for better caching
+COPY package*.json ./
 
-# Start Nginx in the foreground
-CMD ["nginx", "-g", "daemon off;"]
+# Install all dependencies including peer dependencies
+RUN npm install -g npm@latest && \
+    npm install && \
+    npm install -D tailwindcss postcss autoprefixer arg
+
+# Copy the rest of the application
+COPY . .
+
+# Generate Tailwind and PostCSS config files
+RUN npx tailwindcss init -p
+
+EXPOSE 5173
+
+ENV VITE_HOST=0.0.0.0
+ENV PATH=/app/node_modules/.bin:$PATH
+
+CMD ["npm", "run", "dev", "--", "--host"]
