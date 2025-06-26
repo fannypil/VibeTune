@@ -5,15 +5,16 @@ WORKDIR /app
 # Copy package files first for better caching
 COPY package*.json ./
 
-# Install all dependencies including peer dependencies
-RUN npm install -g npm@latest && \
-    npm install && \
-    npm install -D tailwindcss postcss autoprefixer arg
+# Clean install dependencies
+RUN npm cache clean --force && \
+    npm install --legacy-peer-deps && \
+    npm install @heroicons/react react-router-dom lucide-react
+
 
 # Copy the rest of the application
 COPY . .
 
-# Generate Tailwind and PostCSS config files
+# Initialize Tailwind
 RUN npx tailwindcss init -p
 
 EXPOSE 5173
