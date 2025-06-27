@@ -6,7 +6,6 @@ import {
   PlayCircle, 
   Loader2 
 } from 'lucide-react';
-import '../styles/trending.css'; // Assuming you have a CSS file for styles
 const tabs = [
   { id: 'tracks', label: 'Hot Tracks', icon: Disc },
   { id: 'artists', label: 'Popular Artists', icon: Users },
