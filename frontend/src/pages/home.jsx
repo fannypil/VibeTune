@@ -1,53 +1,87 @@
-import { useState } from "react";
-import { Sparkles, Search as SearchIcon, TrendingUp } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Sparkles, Search as SearchIcon, Loader2 } from "lucide-react";
 import TrackCard from "../components/trackCard";
 
-// Test data
-const dummyTracks = [
-  {
-    id: 1,
-    title: "Bohemian Rhapsody",
-    artist: "Queen",
-    genre: "rock",
-    duration: "5:55",
-    image: "https://i.ytimg.com/vi/fJ9rUzIMcZQ/maxresdefault.jpg",
-    youtube_id: "fJ9rUzIMcZQ"
-  },
-  {
-    id: 2,
-    title: "Blinding Lights",
-    artist: "The Weeknd",
-    genre: "pop",
-    duration: "3:20",
-    image: "https://i.ytimg.com/vi/4NRXx6U8ABQ/maxresdefault.jpg",
-    youtube_id: "4NRXx6U8ABQ"
-  }
+const genres = [
+  { id: "all", label: "All" },
+  { id: "pop", label: "Pop" },
+  { id: "rock", label: "Rock" },
+  { id: "jazz", label: "Jazz" },
+  { id: "classical", label: "Classical" },
+  { id: "electronic", label: "Electronic" },
+  { id: "hip-hop", label: "Hip-Hop" }
 ];
-
-const genres = ["All", "Pop", "Rock", "Jazz", "Classical", "Electronic", "Hip-Hop"];
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedGenre, setSelectedGenre] = useState("All");
-  const [tracks] = useState(dummyTracks); // Using dummy data
+  const [selectedGenre, setSelectedGenre] = useState("all");
+  const [tracks, setTracks] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handlePlayTrack = (track) => {
-    console.log("Playing track:", track);
+  useEffect(() => {
+    if (selectedGenre === "all") {
+      fetchTopTracks();
+    } else {
+      fetchTracksByGenre(selectedGenre);
+    }
+  }, [selectedGenre]);
+
+  const fetchTopTracks = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('http://localhost:8000/lastfm-top-tracks');
+      const data = await response.json();
+      setTracks(data.results.map(track => ({
+        id: `${track.name}-${track.artist}`,
+        title: track.name,
+        artist: track.artist,
+        genre: selectedGenre,
+        url: track.url,
+        image: track.image || "https://placehold.co/400x400?text=No+Image"
+      })));
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch top tracks');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleAddToFavorites = (track) => {
-    console.log("Added to favorites:", track);
+  const fetchTracksByGenre = async (genre) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`http://localhost:8000/genre/${genre}`);
+      const data = await response.json();
+      setTracks(data.map(track => ({
+        id: `${track.title}-${track.artist}`,
+        title: track.title,
+        artist: track.artist,
+        genre: genre,
+        url: track.url,
+        image: track.image || "https://placehold.co/400x400?text=No+Image"
+      })));
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch genre tracks');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Filter tracks based on search and genre
+  const handleGenreChange = (genre) => {
+    setSelectedGenre(genre);
+    setSearchQuery(""); // Reset search when changing genre
+  };
+
   const filteredTracks = tracks.filter(track => {
-    const matchesGenre = selectedGenre === "All" || 
-      track.genre.toLowerCase() === selectedGenre.toLowerCase();
-    const matchesSearch = !searchQuery || 
+    return !searchQuery || 
       track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       track.artist.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesGenre && matchesSearch;
   });
+
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -77,35 +111,49 @@ export default function Home() {
           />
         </div>
 
-        {/* Genre Filter */}
+       {/* Genre Filter */}
         <div className="flex flex-wrap gap-2 mb-8">
           {genres.map((genre) => (
             <button
-              key={genre}
-              onClick={() => setSelectedGenre(genre)}
+              key={genre.id}
+              onClick={() => handleGenreChange(genre.id)}
               className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
-                selectedGenre === genre
+                selectedGenre === genre.id
                   ? "bg-purple-600 text-white"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
-              {genre}
+              {genre.label}
             </button>
           ))}
         </div>
       </div>
 
       {/* Tracks Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {filteredTracks.map((track) => (
-          <TrackCard
-            key={track.id}
-            track={track}
-            onPlay={handlePlayTrack}
-            onAddToFavorites={handleAddToFavorites}
-          />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <p className="text-red-500">{error}</p>
+        </div>
+      ) : filteredTracks.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500">No tracks found</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {filteredTracks.map((track) => (
+            <TrackCard
+              key={track.id}
+              track={track}
+              onPlay={() => console.log("Playing:", track)}
+              onAddToFavorites={() => console.log("Added to favorites:", track)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
