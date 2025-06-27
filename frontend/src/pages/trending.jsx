@@ -92,7 +92,7 @@ export default function Trending() {
           {tracks.map((track, index) => (
             <div
               key={`${track.name}-${track.artist}`}
-              className="track-card group"
+              className="relative bg-white rounded-xl p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
             >
         <div className={`rank-badge ${index < 3 ? `rank-badge-${index + 1}` : 'bg-gray-500 text-white'}`}>
                 {index + 1}
