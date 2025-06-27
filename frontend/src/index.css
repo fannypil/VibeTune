@@ -42,6 +42,25 @@
   .track-card:hover {
     @apply shadow-xl transform -translate-y-1;
   }
+  .youtube-player {
+    @apply fixed bottom-0 left-64 right-0 h-20 bg-white/95 backdrop-blur-lg shadow-2xl border-t border-gray-200/50 z-50;
+  }
+
+  .player-progress {
+    @apply absolute top-0 w-full h-1 bg-gray-200;
+  }
+
+  .player-progress-bar {
+    @apply h-full bg-gradient-to-r from-purple-600 to-indigo-600 transition-all duration-300;
+  }
+
+  .player-button {
+    @apply p-2 rounded-full hover:bg-gray-100 transition-colors;
+  }
+
+  .player-button-primary {
+    @apply w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 flex items-center justify-center shadow-lg transition-colors;
+  }
 }
 
 /* Regular CSS */
@@ -57,4 +76,25 @@
   backdrop-filter: blur(20px);
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+input[type="range"] {
+  height: 4px;
+  border-radius: 2px;
+  appearance: none;
+  background: #e2e8f0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #7c3aed;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
 }
