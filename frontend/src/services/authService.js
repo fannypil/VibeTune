@@ -40,7 +40,7 @@ export const authService = {
     return response.json();
   },
 
-  async getCurrentUser() {
+async getCurrentUser() {
     const token = localStorage.getItem('token');
     if (!token) return null;
 

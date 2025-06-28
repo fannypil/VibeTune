@@ -1,6 +1,7 @@
-import React from "react";
-import { Link, useLocation, Outlet } from "react-router-dom"; 
-import { Home, Music, User, TrendingUp, Disc3,ListMusic } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation, Outlet,useNavigate } from "react-router-dom"; 
+import { Home, Music, User, TrendingUp, Disc3,ListMusic,LogOut } from "lucide-react";
+import { authService } from "./services/authService";
 
 const navigationItems = [
   {
@@ -27,6 +28,35 @@ const navigationItems = [
 
 export default function Layout() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+    loadUser();
+  }, []);
+
+  const loadUser = async () => {
+    try {
+      const userData = await authService.getCurrentUser();
+      setUser(userData);
+    } catch (error) {
+      console.error('Failed to load user:', error);
+      // If we can't load the user, they're probably not authenticated
+      navigate('/auth');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      localStorage.removeItem('token');
+      navigate('/auth');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
     <div className="flex h-screen overflow-hidden bg-white">
@@ -70,9 +100,20 @@ export default function Layout() {
                 <User className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 text-sm truncate">Music Lover</p>
-                <p className="text-xs text-gray-600 truncate">Premium Member</p>
+                <p className="font-semibold text-gray-900 text-sm truncate">
+                    {user ? `${user.first_name} ${user.last_name}` : 'Loading...'}
+                </p>
+                <p className="text-xs text-gray-600 truncate">
+                     {user?.email}
+                </p>
               </div>
+              <button
+                onClick={handleLogout}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Logout"
+              >
+                  <LogOut className="w-5 h-5 text-gray-600 hover:text-red-500 transition-colors" /> 
+                </button>
             </div>
           </div>
         </div>
