@@ -1,19 +1,11 @@
 import { useState, useEffect } from "react";
-import { Sparkles, Search as SearchIcon, Loader2 } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 import TrackCard from "../components/trackCard";
 import YouTubePlayer from "../components/youtubeplayer";
 import SearchBar from "../components/searchBar";
+import GenreFilter from "../components/genreFilter";
+import trackService from "../services/musicService";
 
-
-const genres = [
-  { id: "all", label: "All" },
-  { id: "pop", label: "Pop" },
-  { id: "rock", label: "Rock" },
-  { id: "jazz", label: "Jazz" },
-  { id: "classical", label: "Classical" },
-  { id: "electronic", label: "Electronic" },
-  { id: "hip-hop", label: "Hip-Hop" }
-];
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,52 +17,19 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    if (selectedGenre === "all") {
-      fetchTopTracks();
-    } else {
-      fetchTracksByGenre(selectedGenre);
-    }
+    fetchTracks();
   }, [selectedGenre]);
 
-  const fetchTopTracks = async () => {
+  const fetchTracks = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/lastfm-top-tracks');
-      const data = await response.json();
-      setTracks(data.results.map(track => ({
-        id: `${track.name}-${track.artist}`,
-        title: track.name,
-        artist: track.artist,
-        genre: selectedGenre,
-        url: track.url,
-        image: track.image || "https://placehold.co/400x400?text=No+Image"
-      })));
+      const tracks = selectedGenre === "all" 
+        ? await trackService.getTopTracks()
+        : await trackService.getTracksByGenre(selectedGenre);
+      setTracks(tracks);
       setError(null);
     } catch (err) {
-      setError('Failed to fetch top tracks');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchTracksByGenre = async (genre) => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`http://localhost:8000/genre/${genre}`);
-      const data = await response.json();
-      setTracks(data.map(track => ({
-        id: `${track.title}-${track.artist}`,
-        title: track.title,
-        artist: track.artist,
-        genre: genre,
-        url: track.url,
-        image: track.image || "https://placehold.co/400x400?text=No+Image"
-      })));
-      setError(null);
-    } catch (err) {
-      setError('Failed to fetch genre tracks');
-      console.error(err);
+      setError(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -132,19 +91,10 @@ export default function Home() {
 
         {/* Genre Filter */}
           <div className="flex flex-wrap gap-2 mb-8">
-            {genres.map((genre) => (
-              <button
-                key={genre.id}
-                onClick={() => handleGenreChange(genre.id)}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
-                  selectedGenre === genre.id
-                    ? "bg-purple-600 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
-              >
-                {genre.label}
-              </button>
-            ))}
+           <GenreFilter
+              selectedGenre={selectedGenre}
+              onGenreChange={handleGenreChange}
+            />
           </div>
         </div>
 

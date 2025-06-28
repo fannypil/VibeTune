@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  TrendingUp, 
-  Users, 
-  Disc, 
-  PlayCircle, 
-  Loader2 
-} from 'lucide-react';
+import { TrendingUp, Users, Disc, PlayCircle, Loader2 } from 'lucide-react';
+import { trackService } from '../services/musicService';
+
 const tabs = [
   { id: 'tracks', label: 'Hot Tracks', icon: Disc },
   { id: 'artists', label: 'Popular Artists', icon: Users },
@@ -28,13 +24,11 @@ export default function Trending() {
     
     try {
       if (activeTab === 'tracks') {
-        const response = await fetch('http://localhost:8000/lastfm-top-tracks');
-        const data = await response.json();
-        setTracks(data.results || []);
+        const trendingTracks = await trackService.getTrendingTracks();
+        setTracks(trendingTracks);
       } else {
-        const response = await fetch('http://localhost:8000/lastfm-top-artists');
-        const data = await response.json();
-        setArtists(data || []);
+        const trendingArtists = await trackService.getTrendingArtists();
+        setArtists(trendingArtists);
       }
     } catch (err) {
       setError('Failed to load trending content');
@@ -43,14 +37,6 @@ export default function Trending() {
       setIsLoading(false);
     }
   };
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
-  }
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
