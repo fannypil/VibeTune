@@ -38,7 +38,7 @@ const discoveryModes = [
   { value: "mix", label: "Balanced Mix", icon: "⚖️" }
 ];
 
-export default function Search() {
+export default function Generate() {
   const [isLoading, setIsLoading] = useState(false);
   const [tracks, setTracks] = useState([]);
   const [error, setError] = useState(null);
