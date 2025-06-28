@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, Users, Disc, PlayCircle, Loader2 } from 'lucide-react';
-import { trackService } from '../services/musicService';
+import trackService from '../services/musicService';
 
 const tabs = [
   { id: 'tracks', label: 'Hot Tracks', icon: Disc },
@@ -76,7 +76,7 @@ export default function Trending() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tracks.map((track, index) => (
             <div
-              key={`${track.name}-${track.artist}`}
+              key={`${track.title}-${track.artist}`}
               className="relative bg-white rounded-xl p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
             >
         <div className={`rank-badge ${index < 3 ? `rank-badge-${index + 1}` : 'bg-gray-500 text-white'}`}>
@@ -88,7 +88,7 @@ export default function Trending() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-bold text-gray-900 group-hover:text-purple-600 transition-colors">
-                    {track.name}
+                    {track.title}
                   </h3>
                   <p className="text-gray-600 text-sm">{track.artist}</p>
                 </div>

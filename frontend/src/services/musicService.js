@@ -1,6 +1,6 @@
 const API_BASE_URL = 'http://localhost:8000';
 
-export const trackService = {
+const trackService = {
   async getTopTracks() {
     try {
       const response = await fetch(`${API_BASE_URL}/lastfm-top-tracks`);
@@ -35,15 +35,21 @@ export const trackService = {
     }
   },
 
-   async getTrendingTracks() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/lastfm-top-tracks`);
-      const data = await response.json();
-      return data.results || [];
-    } catch (err) {
-      throw new Error('Failed to fetch trending tracks');
-    }
-  },
+async getTrendingTracks() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/lastfm-top-tracks`);
+    const data = await response.json();
+    return data.results.map(track => ({
+      id: `${track.name}-${track.artist}`,
+      title: track.name,
+      artist: track.artist,
+      url: track.url,
+      image: track.image || "https://placehold.co/400x400?text=No+Image"
+    }));
+  } catch (err) {
+    throw new Error('Failed to fetch trending tracks');
+  }
+},
 
   async getTrendingArtists() {
     try {
@@ -55,3 +61,4 @@ export const trackService = {
     }
   }
 };
+export default trackService;
