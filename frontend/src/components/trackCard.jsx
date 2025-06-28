@@ -12,14 +12,20 @@ const genreColors = {
 };
 
 export default function TrackCard({ track, onPlay, onAddToFavorites }) {
+    const {
+    title,
+    artist,
+    image = "https://placehold.co/400x400?text=No+Image",
+    genre = "unknown"
+  } = track;
   return (
     <div className="group bg-white/80 backdrop-blur-sm hover:bg-white hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-0 shadow-lg rounded-2xl overflow-hidden">
       <div className="relative">
         <div className="w-full aspect-video bg-gradient-to-br from-gray-200 to-gray-300 relative overflow-hidden">
           {track?.image ? (
-            <img 
-              src={track.image} 
-              alt={track.title}
+             <img
+                src={image}
+                alt={`${title} by ${artist}`}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
             />
           ) : (
