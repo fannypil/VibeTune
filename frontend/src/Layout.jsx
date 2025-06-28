@@ -1,7 +1,6 @@
 import React from "react";
 import { Link, useLocation, Outlet } from "react-router-dom"; 
-import { Home, Music, Search, User, TrendingUp, Disc3 } from "lucide-react";
-
+import { Home, Music, User, TrendingUp, Disc3,ListMusic } from "lucide-react";
 
 const navigationItems = [
   {
@@ -15,9 +14,9 @@ const navigationItems = [
     icon: Music,
   },
   {
-    title: "Search Tracks",
-    url: "/search",
-    icon: Search,
+    title: "Generate Playlist",
+    url: "/generate",
+    icon: ListMusic,
   },
   {
     title: "Trending",
