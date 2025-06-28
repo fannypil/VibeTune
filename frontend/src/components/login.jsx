@@ -1,22 +1,23 @@
-import { useState } from 'react'
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Mail, Lock, Loader2, CheckCircle } from 'lucide-react';
 
-function Login() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  })
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+export default function Login({ onSwitchToRegister }) {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError('')
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
 
     try {
-      const formBody = new URLSearchParams()
-      formBody.append('username', formData.email) // Backend expects email as username
-      formBody.append('password', formData.password)
+      const formBody = new URLSearchParams();
+      formBody.append('username', formData.email);
+      formBody.append('password', formData.password);
 
       const response = await fetch('http://localhost:8000/auth/login', {
         method: 'POST',
@@ -24,91 +25,106 @@ function Login() {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: formBody
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || 'Login failed')
+        throw new Error(data.detail || 'Login failed');
       }
 
-      // Store token in localStorage
-      localStorage.setItem('token', data.access_token)
-      
-      // TODO: Redirect to dashboard or home page
-      console.log('Login successful')
+      localStorage.setItem('token', data.access_token);
+      setIsSuccess(true);
+ // Delay navigation to show success message
+      setTimeout(() => {
+        navigate('/home');
+      }, 1500);
 
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
+  if (isSuccess) {
+    return (
+      <div className="w-full text-center py-8">
+        <div className="flex justify-center mb-4">
+          <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center animate-scale-up">
+            <CheckCircle className="w-8 h-8 text-green-400" />
+          </div>
+        </div>
+        <h3 className="text-2xl font-bold text-white mb-2 animate-fade-in">
+          Welcome Back!
+        </h3>
+        <p className="text-purple-200 mb-4 animate-fade-in">
+          Taking you to your dashboard...
+        </p>
+        <div className="flex justify-center">
+          <Loader2 className="w-6 h-6 text-purple-400 animate-spin" />
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Login to VibeTune
-          </h2>
+    <div className="w-full">
+      <h2 className="text-2xl font-bold text-white mb-6">Welcome Back</h2>
+      
+      {error && (
+        <div className="bg-red-500/10 text-red-200 p-4 rounded-lg mb-6">
+          {error}
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email" className="sr-only">Email address</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">Password</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
+      )}
 
-          {error && (
-            <div className="text-red-500 text-sm text-center">
-              {error}
-            </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="relative">
+          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/40 w-5 h-5" />
+          <input
+            type="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white"
+            required
+          />
+        </div>
+        <div className="relative">
+          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/40 w-5 h-5" />
+          <input
+            type="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white"
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium"
+        >
+          {isLoading ? (
+            <span className="flex items-center justify-center">
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              Signing in...
+            </span>
+          ) : (
+            'Sign In'
           )}
+        </button>
+      </form>
 
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-            >
-              {isLoading ? 'Signing in...' : 'Sign in'}
-            </button>
-          </div>
-        </form>
+      <div className="mt-6 text-center">
+        <button
+          onClick={onSwitchToRegister}
+          className="text-purple-200 hover:text-white transition-colors"
+        >
+          Need an account? Sign up
+        </button>
       </div>
     </div>
-  )
+  );
 }
-
-export default Login
