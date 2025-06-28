@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Sparkles, Search as SearchIcon, Loader2 } from "lucide-react";
 import TrackCard from "../components/trackCard";
 import YouTubePlayer from "../components/youtubeplayer";
+import SearchBar from "../components/searchBar";
 
 
 const genres = [
@@ -22,7 +23,6 @@ export default function Home() {
   const [error, setError] = useState(null);
   const [currentTrack, setCurrentTrack] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-
 
   useEffect(() => {
     if (selectedGenre === "all") {
@@ -81,11 +81,19 @@ export default function Home() {
     setSearchQuery(""); // Reset search when changing genre
   };
 
-  const filteredTracks = tracks.filter(track => {
-    return !searchQuery || 
-      track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      track.artist.toLowerCase().includes(searchQuery.toLowerCase());
-  });
+  const handleSearchResults = (searchResults) => {
+    if (searchResults === null) {
+      // Reset to default tracks when search is cleared
+      if (selectedGenre === "all") {
+        fetchTopTracks();
+      } else {
+        fetchTracksByGenre(selectedGenre);
+      }
+    } else {
+      setTracks(searchResults);
+      setSelectedGenre('all');
+    }
+  };
 
     const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
@@ -100,6 +108,7 @@ export default function Home() {
     // Implement previous track logic
     console.log("Previous track");
   };
+
 
   return (
     <>
@@ -118,16 +127,7 @@ export default function Home() {
 
           {/* Search Bar */}
           <div className="relative max-w-2xl mb-8">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search for tracks, artists, or albums..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            />
+              <SearchBar onSearchResults={handleSearchResults} />
           </div>
 
         {/* Genre Filter */}
@@ -157,13 +157,13 @@ export default function Home() {
           <div className="text-center py-12">
             <p className="text-red-500">{error}</p>
           </div>
-        ) : filteredTracks.length === 0 ? (
+        ) : tracks.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500">No tracks found</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredTracks.map((track) => (
+            {tracks.map((track) => (
               <TrackCard
                 key={track.id}
                 track={track}
