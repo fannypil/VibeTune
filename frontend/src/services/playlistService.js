@@ -162,6 +162,44 @@ async addTracksToPlaylist(playlistId, tracks) {
     throw new Error('Failed to add tracks to playlist');
   }
 },
+async getFavoritePlaylists() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/playlist/favorites`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return []; // Return empty array for no favorites
+      }
+      const error = await response.json();
+      throw new Error(error.detail || 'Failed to fetch favorite playlists');
+    }
+
+    const data = await response.json();
+    return data.map(playlist => ({
+      id: playlist.id,
+      name: playlist.name,
+      description: playlist.description,
+      created_at: playlist.created_at,
+      is_favorite: true // These are favorite playlists, so always true
+    }));
+  } catch (error) {
+    console.error('Error fetching favorite playlists:', error);
+    if (error.message === 'No playlists found') {
+      return []; // Return empty array for no playlists found
+    }
+    throw error;
+  }
+},
 
   // Helper methods
 transformTracks(tracks) {
