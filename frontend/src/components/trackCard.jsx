@@ -1,5 +1,6 @@
 import React from "react";
 import { Play, Heart, MoreHorizontal, Clock, Music } from "lucide-react";
+import { youtubeService } from "../services/youtubeService";
 
 const genreColors = {
   pop: "bg-pink-100 text-pink-800",
@@ -18,6 +19,23 @@ export default function TrackCard({ track, onPlay, onAddToFavorites }) {
     image = "https://placehold.co/400x400?text=No+Image",
     genre = "unknown"
   } = track;
+  const handlePlay = async () => {
+  try {
+    if (!track.videoId) {
+      console.log('Fetching video ID for:', track.title, track.artist);
+      const videoId = await youtubeService.getVideoId(track);
+      if (!videoId) {
+        throw new Error('No video found for this track');
+      }
+      track.videoId = videoId;
+    }
+    onPlay?.({ ...track, videoId: track.videoId });
+  } catch (error) {
+    console.error('Failed to play track:', error);
+    // Show error notification to user
+    alert('Unable to play this track. Please try another one.');
+  }
+};
   return (
     <div className="group bg-white/80 backdrop-blur-sm hover:bg-white hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-0 shadow-lg rounded-2xl overflow-hidden">
       <div className="relative">
@@ -38,7 +56,7 @@ export default function TrackCard({ track, onPlay, onAddToFavorites }) {
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
             <button
               className="w-14 h-14 rounded-full bg-white/90 hover:bg-white hover:scale-110 transition-all duration-300 opacity-0 group-hover:opacity-100 shadow-2xl flex items-center justify-center"
-              onClick={() => onPlay?.(track)}
+              onClick={handlePlay}
             >
               <Play className="w-6 h-6 text-gray-800 ml-1" />
             </button>
@@ -60,12 +78,6 @@ export default function TrackCard({ track, onPlay, onAddToFavorites }) {
               {track?.title}
             </h3>
             <p className="text-gray-600 font-medium mt-1">{track?.artist}</p>
-          </div>
-
-          {/* Duration */}
-          <div className="flex items-center text-sm text-gray-500 gap-1">
-            <Clock className="w-4 h-4" />
-            <span>{track?.duration || "0:00"}</span>
           </div>
 
           {/* Action buttons */}
