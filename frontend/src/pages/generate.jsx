@@ -140,9 +140,8 @@ const handleQuizSubmit = async () => {
     }
   };
 const handlePlaylistSaved = (savedPlaylist) => {
-  // Optional: Show success message or redirect
-  console.log('Playlist saved:', savedPlaylist);
-  // You could add a toast notification here
+  console.log('Generated tracks:', tracks);
+  console.log('Saved playlist:', savedPlaylist);
 };
 
   return (
@@ -364,12 +363,16 @@ const handlePlaylistSaved = (savedPlaylist) => {
       ))}
     </div>
 
-    <SavePlaylistModal
-      isOpen={showSaveModal}
-      onClose={() => setShowSaveModal(false)}
-      tracks={tracks}
-      onPlaylistSaved={handlePlaylistSaved}
-    />
+   <SavePlaylistModal
+        isOpen={showSaveModal}
+        onClose={() => setShowSaveModal(false)}
+        tracks={tracks.map(track => ({
+          title: track.title,
+          artist: track.artist,
+          url: track.url
+        }))}
+        onPlaylistSaved={handlePlaylistSaved}
+      />
   </>
 )}
     </div>

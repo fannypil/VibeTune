@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Mail, Lock, User, Save, Loader2 } from "lucide-react";
+import React, { useState,useEffect } from "react";
+import {Save, Loader2 } from "lucide-react";
 import { playlistService } from "../services/playlistService";
 
 const GENRES = [
@@ -8,55 +8,58 @@ const GENRES = [
 ];
 
 export default function SavePlaylistModal({ isOpen, onClose, tracks, onPlaylistSaved }) {
-const [playlistData, setPlaylistData] = useState({
-  name: "AI Generated Playlist", // Changed from title to name
-  description: "Discovered through AI recommendations",
-  tracks: tracks // Keep only required fields
-});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  // Add debug log for incoming tracks
+  useEffect(() => {
+    console.log('Incoming tracks:', tracks);
+  }, [tracks]);
 
-const handleSave = async () => {
-  if (!playlistData.name.trim()) return;
-  
-  setIsLoading(true);
-  setError('');
+  const [playlistData, setPlaylistData] = useState({
+    name: "AI Generated Playlist",
+    description: "Discovered through AI recommendations",
+    tracks: []
+  });
 
-  try {
-       // Check if token exists
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setError('Please log in to save playlists');
-      navigate('/auth');
-      return;
-    }
-
-    const playlistToSave = {
-      name: playlistData.name,
-      description: playlistData.description,
-      tracks: tracks.map(track => ({
-        name: track.title, // Use title as track name
+  // Update tracks when they change
+  useEffect(() => {
+    if (Array.isArray(tracks) && tracks.length > 0) {
+      const formattedTracks = tracks.map(track => ({
+        name: track.title, // Use title consistently
         artist: track.artist,
         url: track.url || null
-      }))
-    };
-
-    const savedPlaylist = await playlistService.createPlaylist(playlistToSave);
-    onPlaylistSaved(savedPlaylist);
-    onClose();
-  } catch (err) {
-    console.error('Save error:', err);
-    if (err.message.includes('Authentication')) {
-      setError('Please log in again to save playlists');
-      navigate('/auth');
-    } else {
-      setError(err.message || 'Failed to save playlist');
+      }));
+      
+      console.log('Formatted tracks:', formattedTracks);
+      
+      setPlaylistData(prev => ({
+        ...prev,
+        tracks: formattedTracks
+      }));
     }
-  } finally {
-    setIsLoading(false);
-  }
-};
+  }, [tracks]);
 
+const handleSave = async () => {
+    if (!playlistData.name.trim()) return;
+    
+    setIsLoading(true);
+    setError('');
+
+    try {
+      // Debug logs
+      console.log('PlaylistData before save:', playlistData);
+      console.log('Tracks count:', playlistData.tracks.length);
+
+      const savedPlaylist = await playlistService.createPlaylist(playlistData);
+      onPlaylistSaved(savedPlaylist);
+      onClose();
+    } catch (err) {
+      console.error('Save error:', err);
+      setError(err.message || 'Failed to save playlist');
+    } finally {
+      setIsLoading(false);
+    }
+  };
   if (!isOpen) return null;
 
   return (

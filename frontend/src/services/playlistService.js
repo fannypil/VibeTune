@@ -87,64 +87,81 @@ async getPlaylists() {
   }
 },
 
- async createPlaylist(playlistData) {
+  async createPlaylist(playlistData) {
     const token = localStorage.getItem('token');
     if (!token) {
       throw new Error('Authentication required');
     }
 
-    // Debug log
-    console.log('Token:', token);
+    try {
+      // First create playlist without tracks
+      const response = await fetch(`${API_BASE_URL}/playlist`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: playlistData.name,
+          description: playlistData.description
+        })
+      });
 
- // Format data according to PlaylistCreate schema
-  const requestBody = {
-    name: playlistData.name,
-    description: playlistData.description,
-    tracks: playlistData.tracks.map(track => ({
-      name: track.title || track.name, // Track name is required
-      artist: track.artist, // Artist is required
-      url: track.url || null // URL is optional
-    }))
-  };
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to create playlist');
+      }
 
-  // Debug log
-    console.log('Creating playlist with data:', requestBody);
-try{
-    const response = await fetch(`${API_BASE_URL}/playlist`, {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify(requestBody)
-  });
+      const playlist = await response.json();
+      
+      // Then add tracks using the existing endpoint
+      if (playlistData.tracks && playlistData.tracks.length > 0) {
+        await this.addTracksToPlaylist(playlist.id, playlistData.tracks);
+      }
 
-  // Debug log
-  console.log('Response status:', response.status);
-
-  if (!response.ok) {
-    const error = await response.json();
-    console.error('Server error:', error); // Debug log
-    throw new Error(error.detail || 'Failed to create playlist');
-  }
-
-   const data = await response.json();
-      return data;
+      return playlist;
     } catch (error) {
       console.error('Playlist creation error:', error);
       throw error;
     }
   },
 
-  async addTracksToPlaylist(playlistId, tracks) {
-    const response = await fetch(`${API_BASE_URL}/playlists/${playlistId}/tracks`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tracks })
-    });
-    if (!response.ok) throw new Error('Failed to add tracks to playlist');
-    return response.json();
-  },
+async addTracksToPlaylist(playlistId, tracks) {
+  const token = localStorage.getItem('token');
+  
+  try {
+    // Add tracks one by one using the track endpoint
+    const addTrackPromises = tracks.map(track => 
+      fetch(`${API_BASE_URL}/track/${playlistId}/tracks`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: track.name || track.title,
+          artist: track.artist,
+          url: track.url || null,
+          playlist_id: playlistId 
+        })
+      }).then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to add track');
+        }
+        return response.json();
+      })
+    );
+
+    // Wait for all tracks to be added
+    const results = await Promise.all(addTrackPromises);
+    console.log('Added tracks:', results);
+    
+    return results;
+  } catch (error) {
+    console.error('Error adding tracks:', error);
+    throw new Error('Failed to add tracks to playlist');
+  }
+},
 
   // Helper methods
 transformTracks(tracks) {
