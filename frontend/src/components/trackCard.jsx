@@ -1,5 +1,5 @@
 import React from "react";
-import { Play, Heart, MoreHorizontal, Clock, Music } from "lucide-react";
+import { Play, Heart, MoreHorizontal, Music } from "lucide-react";
 import { youtubeService } from "../services/youtubeService";
 
 const genreColors = {

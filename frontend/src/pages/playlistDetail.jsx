@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Play, Pencil, Trash2, Music,Loader2,Users,Lock } from "lucide-react";
+import { ArrowLeft, Play, Pencil, Trash2, Music,Loader2 } from "lucide-react";
 import { playlistService } from "../services/playlistService";
 import RenamePlaylistDialog from "../components/renamePlaylistDialog";
 import DeletePlaylistAlert from "../components/deletePlaylistAlert";

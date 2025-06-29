@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Music, Play, MoreHorizontal, Heart } from "lucide-react";
+import { Plus, Music, Play, MoreHorizontal, Heart,HeartOff } from "lucide-react";
 import { playlistService } from "../services/playlistService";
 import TrackCard from "../components/trackCard";
 
@@ -110,7 +110,7 @@ export default function Playlists() {
           </div>
           {activeTab === 'my-playlists' && (
             <button
-              onClick={() => {/* Add create playlist logic */}}
+              onClick={() => navigate('/generate')}
               className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-xl shadow-lg hover:from-purple-700 hover:to-indigo-700 transition-all flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
@@ -178,12 +178,46 @@ export default function Playlists() {
                   <h3 className="font-bold text-gray-900 mb-1">{playlist.name}</h3>
                   <p className="text-sm text-gray-600 mb-2">{playlist.description}</p>
                 </div>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                 onClick={(e) => {
-                  e.stopPropagation();}}
-                >
-                  <MoreHorizontal className="w-5 h-5 text-gray-500" />
-                </button>
+               <button
+                className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  try {
+                    if (playlist.is_favorite) {
+                      await playlistService.unfavoritePlaylist(playlist.id);
+                    } else {
+                      await playlistService.favoritePlaylist(playlist.id);
+                    }
+                     if (activeTab === 'my-playlists') {
+                      setPlaylists((prev) =>
+                        prev.map((p) =>
+                          p.id === playlist.id ? { ...p, is_favorite: !p.is_favorite } : p
+                        )
+                      );
+                    } else {
+                      // If in favorites tab, remove from list if unfavorited, or add if favorited
+                      if (playlist.is_favorite) {
+                        setFavoritePlaylists((prev) => prev.filter((p) => p.id !== playlist.id));
+                      } else {
+                        setFavoritePlaylists((prev) => [
+                          ...prev,
+                          { ...playlist, is_favorite: true },
+                        ]);
+                      }
+                    }
+                    // Refresh playlists after change
+                  } catch (err) {
+                    alert("Failed to update favorite status");
+                  }
+                }}
+                aria-label={playlist.is_favorite ? "Remove from favorites" : "Add to favorites"}
+              >
+                 {playlist.is_favorite ? (
+                  <Heart className="w-5 h-5 text-red-500 fill-red-500" />
+                ) : (
+                  <HeartOff className="w-5 h-5 text-gray-400" />
+                )}
+              </button>
               </div>
             </div>
           ))}
@@ -208,7 +242,7 @@ export default function Playlists() {
           </p>
           {activeTab === 'my-playlists' && (
             <button 
-              onClick={() => {/* Add create playlist logic */}}
+              onClick={() => navigate('/generate')}
               className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-xl shadow-lg hover:from-purple-700 hover:to-indigo-700 transition-all flex items-center gap-2 mx-auto"
             >
               <Plus className="w-5 h-5" />

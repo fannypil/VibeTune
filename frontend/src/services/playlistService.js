@@ -200,6 +200,27 @@ async getFavoritePlaylists() {
     throw error;
   }
 },
+async favoritePlaylist(id) {
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('Authentication required');
+  const response = await fetch(`${API_BASE_URL}/playlist/${id}/favorite`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  if (!response.ok) throw new Error('Failed to favorite playlist');
+  return true;
+},
+
+async unfavoritePlaylist(id) {
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('Authentication required');
+  const response = await fetch(`${API_BASE_URL}/playlist/${id}/favorite`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  if (!response.ok) throw new Error('Failed to unfavorite playlist');
+  return true;
+},
 async getPlaylistById(id) {
     const token = localStorage.getItem('token');
     if (!token) {
