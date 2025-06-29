@@ -1,23 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { Loader2, Plus, Music, Play, MoreHorizontal, Users, Lock } from "lucide-react";
+import { Loader2, Plus, Music, Play, MoreHorizontal, Users, Lock, Heart } from "lucide-react";
 import { playlistService } from "../services/playlistService";
 import TrackCard from "../components/trackCard";
 
 export default function Playlists() {
   const [playlists, setPlaylists] = useState([]);
+  const [favoritePlaylists, setFavoritePlaylists] = useState([]);
+  const [activeTab, setActiveTab] = useState('my-playlists');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     loadPlaylists();
-  }, []);
+  }, [activeTab]);
 
   const loadPlaylists = async () => {
     setIsLoading(true);
+    setError(null);
     try {
-      const data = await playlistService.getPlaylists();
-      setPlaylists(data);
-      setError(null);
+      if (activeTab === 'my-playlists') {
+        const data = await playlistService.getPlaylists();
+        setPlaylists(data);
+      } else {
+        const data = await playlistService.getFavoritePlaylists();
+        setFavoritePlaylists(data);
+      }
     } catch (error) {
       console.error("Error loading playlists:", error);
       setError("Failed to load playlists");
@@ -26,29 +33,72 @@ export default function Playlists() {
     }
   };
 
+  // Tab navigation component
+  const TabNavigation = () => (
+    <div className="flex gap-4 mb-8 border-b border-gray-200">
+      <button
+        onClick={() => setActiveTab('my-playlists')}
+        className={`flex items-center gap-2 px-6 py-3 font-medium transition-all border-b-2 -mb-[2px] ${
+          activeTab === 'my-playlists'
+            ? 'border-purple-500 text-purple-700'
+            : 'border-transparent text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        <Music className="w-5 h-5" />
+        My Playlists
+      </button>
+      <button
+        onClick={() => setActiveTab('favorites')}
+        className={`flex items-center gap-2 px-6 py-3 font-medium transition-all border-b-2 -mb-[2px] ${
+          activeTab === 'favorites'
+            ? 'border-purple-500 text-purple-700'
+            : 'border-transparent text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        <Heart className="w-5 h-5" />
+        Favorite Playlists
+      </button>
+    </div>
+  );
+
+  const currentPlaylists = activeTab === 'my-playlists' ? playlists : favoritePlaylists;
+
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+  <div className="p-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center">
-              <Music className="w-8 h-8 text-white" />
+              {activeTab === 'favorites' ? (
+                <Heart className="w-8 h-8 text-white" />
+              ) : (
+                <Music className="w-8 h-8 text-white" />
+              )}
             </div>
             <div>
-              <h1 className="text-4xl font-bold text-gray-900">My Playlists</h1>
-              <p className="text-xl text-gray-600">Organize your favorite tracks</p>
+              <h1 className="text-4xl font-bold text-gray-900">
+                {activeTab === 'favorites' ? 'Favorite Playlists' : 'My Playlists'}
+              </h1>
+              <p className="text-xl text-gray-600">
+                {activeTab === 'favorites' ? 'Your liked playlists' : 'Organize your favorite tracks'}
+              </p>
             </div>
           </div>
-          <button
-            onClick={() => {/* Add create playlist logic */}}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-xl shadow-lg hover:from-purple-700 hover:to-indigo-700 transition-all flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            Create Playlist
-          </button>
+          {activeTab === 'my-playlists' && (
+            <button
+              onClick={() => {/* Add create playlist logic */}}
+              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-xl shadow-lg hover:from-purple-700 hover:to-indigo-700 transition-all flex items-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Create Playlist
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Tab Navigation */}
+      <TabNavigation />
 
       {/* Error Message */}
       {error && (
@@ -68,9 +118,9 @@ export default function Playlists() {
             </div>
           ))}
         </div>
-      ) : playlists.length > 0 ? (
+      ) : currentPlaylists.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {playlists.map((playlist) => (
+          {currentPlaylists.map((playlist) => (
             <div 
               key={playlist.id} 
               className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all group"
@@ -108,19 +158,32 @@ export default function Playlists() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-16">
+           <div className="text-center py-16">
           <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Music className="w-10 h-10 text-gray-400" />
+            {activeTab === 'favorites' ? (
+              <Heart className="w-10 h-10 text-gray-400" />
+            ) : (
+              <Music className="w-10 h-10 text-gray-400" />
+            )}
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">No playlists yet</h3>
-          <p className="text-gray-600 mb-6">Start creating your first playlist</p>
-          <button 
-            onClick={() => {/* Add create playlist logic */}}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-xl shadow-lg hover:from-purple-700 hover:to-indigo-700 transition-all flex items-center gap-2 mx-auto"
-          >
-            <Plus className="w-5 h-5" />
-            Create Your First Playlist
-          </button>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            {activeTab === 'favorites' ? 'No favorite playlists yet' : 'No playlists yet'}
+          </h3>
+          <p className="text-gray-600 mb-6">
+            {activeTab === 'favorites' 
+              ? 'Start adding playlists to your favorites'
+              : 'Start creating your first playlist'
+            }
+          </p>
+          {activeTab === 'my-playlists' && (
+            <button 
+              onClick={() => {/* Add create playlist logic */}}
+              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-xl shadow-lg hover:from-purple-700 hover:to-indigo-700 transition-all flex items-center gap-2 mx-auto"
+            >
+              <Plus className="w-5 h-5" />
+              Create Your First Playlist
+            </button>
+          )}
         </div>
       )}
     </div>
