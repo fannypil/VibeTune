@@ -17,21 +17,41 @@ const [playlistData, setPlaylistData] = useState({
   const [error, setError] = useState("");
 
 const handleSave = async () => {
-  if (!playlistData.name.trim()) {
-    setError("Please enter a playlist name");
-    return;
-  }
+  if (!playlistData.name.trim()) return;
   
   setIsLoading(true);
-  setError("");
-  
+  setError('');
+
   try {
-    const savedPlaylist = await playlistService.createPlaylist(playlistData);
+       // Check if token exists
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('Please log in to save playlists');
+      navigate('/auth');
+      return;
+    }
+
+    const playlistToSave = {
+      name: playlistData.name,
+      description: playlistData.description,
+      tracks: tracks.map(track => ({
+        name: track.title, // Use title as track name
+        artist: track.artist,
+        url: track.url || null
+      }))
+    };
+
+    const savedPlaylist = await playlistService.createPlaylist(playlistToSave);
     onPlaylistSaved(savedPlaylist);
     onClose();
   } catch (err) {
     console.error('Save error:', err);
-    setError(err.message || "Failed to save playlist");
+    if (err.message.includes('Authentication')) {
+      setError('Please log in again to save playlists');
+      navigate('/auth');
+    } else {
+      setError(err.message || 'Failed to save playlist');
+    }
   } finally {
     setIsLoading(false);
   }

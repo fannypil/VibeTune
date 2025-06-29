@@ -13,7 +13,7 @@ router = APIRouter(prefix="/playlist", tags=["Playlists"])
 logger = logging.getLogger(__name__)
 
 
-@router.post("/", response_model=PlaylistOut)
+@router.post("", response_model=PlaylistOut)
 async def create_playlist(
     playlist: PlaylistCreate,
     current_user = Depends(get_current_user),

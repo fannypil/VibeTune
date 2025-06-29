@@ -54,20 +54,86 @@ export const playlistService = {
     }
   },
   // Playlist Management
-  async getPlaylists() {
-    const response = await fetch(`${API_BASE_URL}/playlists`);
-    if (!response.ok) throw new Error('Failed to fetch playlists');
-    return response.json();
-  },
+async getPlaylists() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('Authentication required');
+  }
 
-  async createPlaylist(playlistData) {
-    const response = await fetch(`${API_BASE_URL}/playlists`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(playlistData)
+  try {
+    const response = await fetch(`${API_BASE_URL}/playlist/my-playlists`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
     });
-    if (!response.ok) throw new Error('Failed to create playlist');
-    return response.json();
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Failed to fetch playlists');
+    }
+
+    const data = await response.json();
+    return data.map(playlist => ({
+      id: playlist.id,
+      name: playlist.name,
+      description: playlist.description,
+      created_at: playlist.created_at,
+      is_favorite: playlist.is_favorite || false
+    }));
+  } catch (error) {
+    console.error('Error fetching playlists:', error);
+    throw error;
+  }
+},
+
+ async createPlaylist(playlistData) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    // Debug log
+    console.log('Token:', token);
+
+ // Format data according to PlaylistCreate schema
+  const requestBody = {
+    name: playlistData.name,
+    description: playlistData.description,
+    tracks: playlistData.tracks.map(track => ({
+      name: track.title || track.name, // Track name is required
+      artist: track.artist, // Artist is required
+      url: track.url || null // URL is optional
+    }))
+  };
+
+  // Debug log
+    console.log('Creating playlist with data:', requestBody);
+try{
+    const response = await fetch(`${API_BASE_URL}/playlist`, {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(requestBody)
+  });
+
+  // Debug log
+  console.log('Response status:', response.status);
+
+  if (!response.ok) {
+    const error = await response.json();
+    console.error('Server error:', error); // Debug log
+    throw new Error(error.detail || 'Failed to create playlist');
+  }
+
+   const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Playlist creation error:', error);
+      throw error;
+    }
   },
 
   async addTracksToPlaylist(playlistId, tracks) {
@@ -81,17 +147,18 @@ export const playlistService = {
   },
 
   // Helper methods
-  transformTracks(tracks) {
-    if (!Array.isArray(tracks)) return [];
-    
-    return tracks.map(track => ({
-      id: `${track.title}-${track.artist}`.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-      title: track.title || track.name,
-      artist: track.artist,
-      image: track.image || "https://placehold.co/400x400?text=No+Image",
-      genre: track.genre || "unknown",
-      url: track.url || "#",
-      duration: track.duration || "0:00"
-    }));
-  }
+transformTracks(tracks) {
+  if (!Array.isArray(tracks)) return [];
+  
+  return tracks.map(track => ({
+    id: `${track.title}-${track.artist}`.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+    name: track.name || track.title, 
+    title: track.title || track.name,
+    artist: track.artist,
+    url: track.url || "#",
+    image: track.image || "https://placehold.co/400x400?text=No+Image",
+    genre: track.genre || "unknown",
+    duration: track.duration || "0:00"
+  }));
+}
 };

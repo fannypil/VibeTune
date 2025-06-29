@@ -97,16 +97,8 @@ export default function Playlists() {
 
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-1">{playlist.title}</h3>
-                  <p className="text-sm text-gray-600 mb-2">{playlist.tracks?.length || 0} tracks</p>
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    {playlist.is_public ? (
-                      <Users className="w-4 h-4" />
-                    ) : (
-                      <Lock className="w-4 h-4" />
-                    )}
-                    <span>{playlist.is_public ? "Public" : "Private"}</span>
-                  </div>
+                  <h3 className="font-bold text-gray-900 mb-1">{playlist.name}</h3>
+                  <p className="text-sm text-gray-600 mb-2">{playlist.description}</p>
                 </div>
                 <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                   <MoreHorizontal className="w-5 h-5 text-gray-500" />

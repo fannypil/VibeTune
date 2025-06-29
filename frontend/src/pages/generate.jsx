@@ -1,7 +1,8 @@
 import React, { useState,useCallback } from "react";
-import { Loader2, Wand2, Sparkles, Music } from "lucide-react";
+import { Loader2, Wand2, Sparkles, Music, Save } from "lucide-react";
 import { playlistService } from "../services/playlistService";
 import TrackCard from "../components/trackCard";
+import SavePlaylistModal from "../components/savePlaylistModal";
 
 // Mood options with emojis
 const moods = [
@@ -44,8 +45,8 @@ export default function Generate() {
   const [error, setError] = useState(null);
   const [aiPrompt, setAiPrompt] = useState("");
   const [activeTab, setActiveTab] = useState('quiz'); // 'quiz' or 'prompt'
+  const [showSaveModal, setShowSaveModal] = useState(false);
 
-  
   // Quiz state
   const [selectedMood, setSelectedMood] = useState("");
   const [selectedActivity, setSelectedActivity] = useState("");
@@ -138,7 +139,11 @@ const handleQuizSubmit = async () => {
       setDiscoveryMode('mix');
     }
   };
-
+const handlePlaylistSaved = (savedPlaylist) => {
+  // Optional: Show success message or redirect
+  console.log('Playlist saved:', savedPlaylist);
+  // You could add a toast notification here
+};
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -329,29 +334,44 @@ const handleQuizSubmit = async () => {
         </div>
       )}
 
-      {tracks?.length > 0 && (
-        <>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Your Generated Playlist ({tracks.length} tracks)
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {tracks.map((track) => (
-              <TrackCard
-                key={track.id}
-                track={track}
-                onPlay={() => {
-                  console.log("Playing:", track);
-                  // Add your play logic here
-                }}
-                onAddToFavorites={() => {
-                  console.log("Added to favorites:", track);
-                  // Add your favorites logic here
-                }}
-              />
-            ))}
-          </div>
-        </>
-      )}
+{tracks?.length > 0 && (
+  <>
+    <div className="flex justify-between items-center mb-6">
+      <h2 className="text-2xl font-bold text-gray-900">
+        Your Generated Playlist ({tracks.length} tracks)
+      </h2>
+      <button
+        onClick={() => setShowSaveModal(true)}
+        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all"
+      >
+        <Save className="w-4 h-4" />
+        Save Playlist
+      </button>
+    </div>
+    
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {tracks.map((track) => (
+        <TrackCard
+          key={track.id}
+          track={track}
+          onPlay={() => {
+            console.log("Playing:", track);
+          }}
+          onAddToFavorites={() => {
+            console.log("Added to favorites:", track);
+          }}
+        />
+      ))}
+    </div>
+
+    <SavePlaylistModal
+      isOpen={showSaveModal}
+      onClose={() => setShowSaveModal(false)}
+      tracks={tracks}
+      onPlaylistSaved={handlePlaylistSaved}
+    />
+  </>
+)}
     </div>
   );
 }
