@@ -200,6 +200,127 @@ async getFavoritePlaylists() {
     throw error;
   }
 },
+async getPlaylistById(id) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/playlist/${id}`, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Playlist not found');
+        }
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to fetch playlist');
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching playlist:', error);
+      throw error;
+    }
+  },
+   async updatePlaylist(id, updateData) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/playlist/${id}`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData)
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Playlist not found');
+        }
+        if (response.status === 403) {
+          throw new Error('Not authorized to update this playlist');
+        }
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to update playlist');
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Error updating playlist:', error);
+      throw error;
+    }
+  },
+    async deletePlaylist(id) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/playlist/${id}`, {
+        method: 'DELETE',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Playlist not found');
+        }
+        if (response.status === 403) {
+          throw new Error('Not authorized to delete this playlist');
+        }
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to delete playlist');
+      }
+
+      return true; // Success
+    } catch (error) {
+      console.error('Error deleting playlist:', error);
+      throw error;
+    }
+  },async removeTrackFromPlaylist(playlistId, trackId) {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/track/${playlistId}/tracks/${trackId}`, {
+      method: 'DELETE',
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('Track not found in playlist');
+      }
+      const error = await response.json();
+      throw new Error(error.detail || 'Failed to remove track');
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error removing track:', error);
+    throw error;
+  }
+},
 
   // Helper methods
 transformTracks(tracks) {

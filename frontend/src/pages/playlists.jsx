@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Loader2, Plus, Music, Play, MoreHorizontal, Users, Lock, Heart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Plus, Music, Play, MoreHorizontal, Heart } from "lucide-react";
 import { playlistService } from "../services/playlistService";
 import TrackCard from "../components/trackCard";
 
@@ -9,6 +10,8 @@ export default function Playlists() {
   const [activeTab, setActiveTab] = useState('my-playlists');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isChangingTab, setIsChangingTab] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadPlaylists();
@@ -22,23 +25,34 @@ export default function Playlists() {
         const data = await playlistService.getPlaylists();
         setPlaylists(data);
       } else {
-        const data = await playlistService.getFavoritePlaylists();
-        setFavoritePlaylists(data);
+        try {
+          const data = await playlistService.getFavoritePlaylists();
+          setFavoritePlaylists(data || []); // Use empty array if no favorites
+        } catch (favoriteError) {
+          // Only set error if it's not a "no playlists" response
+          if (favoriteError?.response?.status !== 404) {
+            console.error("Error loading favorite playlists:", favoriteError);
+            setError("Failed to load favorite playlists");
+          }
+          setFavoritePlaylists([]); // Set empty array on error
+        }
       }
     } catch (error) {
       console.error("Error loading playlists:", error);
-      setError("Failed to load playlists");
+      // Only set error for non-404 responses
+      if (error?.response?.status !== 404) {
+        setError("Failed to load playlists");
+      }
     } finally {
       setIsLoading(false);
     }
   };
-
-  // Tab navigation component
+    // Tab navigation component
   const TabNavigation = () => (
     <div className="flex gap-4 mb-8 border-b border-gray-200">
       <button
-        onClick={() => setActiveTab('my-playlists')}
-        className={`flex items-center gap-2 px-6 py-3 font-medium transition-all border-b-2 -mb-[2px] ${
+        onClick={() => handleTabChange('my-playlists')}
+        className={`flex items-center gap-2 px-6 py-3 font-medium transition-all duration-300 border-b-2 -mb-[2px] ${
           activeTab === 'my-playlists'
             ? 'border-purple-500 text-purple-700'
             : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -48,8 +62,8 @@ export default function Playlists() {
         My Playlists
       </button>
       <button
-        onClick={() => setActiveTab('favorites')}
-        className={`flex items-center gap-2 px-6 py-3 font-medium transition-all border-b-2 -mb-[2px] ${
+        onClick={() => handleTabChange('favorites')}
+        className={`flex items-center gap-2 px-6 py-3 font-medium transition-all duration-300 border-b-2 -mb-[2px] ${
           activeTab === 'favorites'
             ? 'border-purple-500 text-purple-700'
             : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -61,7 +75,16 @@ export default function Playlists() {
     </div>
   );
 
-  const currentPlaylists = activeTab === 'my-playlists' ? playlists : favoritePlaylists;
+    const currentPlaylists = activeTab === 'my-playlists' ? playlists : favoritePlaylists;
+    const handlePlaylistClick = (playlistId) => {
+      navigate(`/playlists/${playlistId}`);
+    };
+    const handleTabChange = async (newTab) => {
+      setIsChangingTab(true);
+      await new Promise(resolve => setTimeout(resolve, 300)); // Wait for fade out
+      setActiveTab(newTab);
+      setIsChangingTab(false);
+    };
 
   return (
   <div className="p-8 max-w-7xl mx-auto">
@@ -100,12 +123,13 @@ export default function Playlists() {
       {/* Tab Navigation */}
       <TabNavigation />
 
-      {/* Error Message */}
-      {error && (
-        <div className="text-center py-4 px-6 bg-red-50 text-red-600 rounded-xl mb-8">
-          {error}
-        </div>
-      )}
+      <div className={`transition-all duration-300 ${isChangingTab ? 'animate-fade-slide-out' : 'animate-fade-slide-in'}`}>
+        {/* Error Message */}
+        {error && (
+          <div className="text-center py-4 px-6 bg-red-50 text-red-600 rounded-xl mb-8">
+            {error}
+          </div>
+        )}
 
       {/* Playlists Grid */}
       {isLoading ? (
@@ -124,6 +148,7 @@ export default function Playlists() {
             <div 
               key={playlist.id} 
               className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all group"
+              onClick={() => handlePlaylistClick(playlist.id)}
             >
               <div className="aspect-square rounded-lg overflow-hidden mb-4 relative">
                 {playlist.cover_image ? (
@@ -139,7 +164,10 @@ export default function Playlists() {
                 )}
                 
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <button className="w-14 h-14 rounded-full bg-white shadow-lg flex items-center justify-center hover:scale-110 transition-transform">
+                  <button className="w-14 h-14 rounded-full bg-white shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
+                  onClick={(e) => {
+                  e.stopPropagation(); 
+                   }} >
                     <Play className="w-6 h-6 text-gray-900 ml-1" />
                   </button>
                 </div>
@@ -150,7 +178,10 @@ export default function Playlists() {
                   <h3 className="font-bold text-gray-900 mb-1">{playlist.name}</h3>
                   <p className="text-sm text-gray-600 mb-2">{playlist.description}</p>
                 </div>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                 onClick={(e) => {
+                  e.stopPropagation();}}
+                >
                   <MoreHorizontal className="w-5 h-5 text-gray-500" />
                 </button>
               </div>
@@ -186,6 +217,7 @@ export default function Playlists() {
           )}
         </div>
       )}
+    </div>
     </div>
   );
 }

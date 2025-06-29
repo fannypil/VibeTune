@@ -7,6 +7,7 @@ import Generate from "./pages/generate";
 import Trending from "./pages/trending";
 import Playlists from "./pages/playlists";
 import ProtectedRoute from "./components/ProtectedRoute";
+import PlaylistDetail from "./pages/playlistDetail";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/playlists" element={<Playlists />} />
           <Route path="/generate" element={<Generate />} />
           <Route path="/trending" element={<Trending />} />
+          <Route path="/playlists/:id" element={<PlaylistDetail/>}/>
         </Route>
 
         {/* Catch all redirect to auth */}
