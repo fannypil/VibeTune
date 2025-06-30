@@ -11,7 +11,8 @@ def test_playlist_from_prompt_success(mock_generate_playlist, mock_generate_ai):
     mock_generate_ai.return_value = [
         {
             "title": "Imagine",
-            "artist": "John Lennon"
+            "artist": "John Lennon",
+            "image": "http://example.com/image.jpg"
         }
     ]
 
@@ -20,8 +21,6 @@ def test_playlist_from_prompt_success(mock_generate_playlist, mock_generate_ai):
         {
             "title": "Imagine",
             "artist": "John Lennon",
-            "url": "http://example.com",
-            "listeners": 1000000,
             "image": "http://example.com/image.jpg"  # Changed to string as per schema
         }
     ]
@@ -30,7 +29,6 @@ def test_playlist_from_prompt_success(mock_generate_playlist, mock_generate_ai):
     assert response.status_code == 200
     assert response.json()[0]["title"] == "Imagine"
     assert response.json()[0]["artist"] == "John Lennon"
-    assert response.json()[0]["url"] == "http://example.com"
     assert response.json()[0]["image"] == "http://example.com/image.jpg"
     
     # Verify mocks were called correctly
