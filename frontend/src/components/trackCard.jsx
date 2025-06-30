@@ -13,28 +13,15 @@ const genreColors = {
 };
 
 export default function TrackCard({ track, onPlay, onAddToFavorites }) {
-const {
-    title,
-    artist,
-    image,
-    genre = "unknown"
-  } = track;
-const handlePlay = async () => {
-  try {
-    if (!track.videoId) {
-      console.log('Fetching video ID for:', track.name, track.artist);
-      const videoId = await youtubeService.getVideoId({ title: track.name, artist: track.artist });
-      if (!videoId) {
-        throw new Error('No video found for this track');
-      }
-      track.videoId = videoId;
-    }
-    onPlay?.({ ...track, videoId: track.videoId });
-  } catch (error) {
-    console.error('Failed to play track:', error);
-    alert('Unable to play this track. Please try another one.');
-  }
-};
+  const {
+      title,
+      artist,
+      image,
+      genre = "unknown"
+    } = track;
+  const handlePlay = () => {
+    onPlay(track);
+  };
   return (
     <div className="group bg-white/80 backdrop-blur-sm hover:bg-white hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-0 shadow-lg rounded-2xl overflow-hidden">
       <div className="relative">

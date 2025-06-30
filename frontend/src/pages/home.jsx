@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Sparkles, Loader2 } from "lucide-react";
 import TrackCard from "../components/trackCard";
-import YouTubePlayer from "../components/youtubeplayer";
 import SearchBar from "../components/searchBar";
 import GenreFilter from "../components/genreFilter";
 import trackService from "../services/musicService";
+import MusicPlayer from "../components/musicPlayer";
 
 
 export default function Home() {
@@ -35,10 +35,12 @@ export default function Home() {
     }
   };
 
-  const handleGenreChange = (genre) => {
-    setSelectedGenre(genre);
-    setSearchQuery(""); // Reset search when changing genre
-  };
+ const handleGenreChange = (genre) => {
+  setSelectedGenre(genre);
+  setSearchQuery("");
+  setCurrentTrack(null); // Stop playback
+  setIsPlaying(false);   // Pause player
+};
 
   const handleSearchResults = (searchResults) => {
     if (searchResults === null) {
@@ -55,6 +57,8 @@ export default function Home() {
       })));
       setSelectedGenre('all');
     }
+     setCurrentTrack(null); // Stop playback
+     setIsPlaying(false);   // Pause player
   };
 
     const handlePlayPause = () => {
@@ -142,10 +146,8 @@ export default function Home() {
           </div>
         )}
       </div>
-      <YouTubePlayer
-        currentTrack={currentTrack}
-        isPlaying={isPlaying}
-        onPlayPause={handlePlayPause}
+      <MusicPlayer
+        track={currentTrack}
         onNext={handleNext}
         onPrevious={handlePrevious}
       />

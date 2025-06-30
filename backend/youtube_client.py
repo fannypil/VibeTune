@@ -38,3 +38,4 @@ def search_youtube_video(query: str) -> Optional[str]:
         
     except requests.RequestException as e:
         raise Exception(f"Network error: {str(e)}")
+    
