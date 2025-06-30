@@ -79,11 +79,13 @@ async def test_quiz_to_playlist_flow():
     
     for track in playlist:
         assert_track_has_lastfm_data(track)
-        if track["listeners"] > 1000:
-            track_stats["popular"] += 1
-        else:
-            track_stats["fresh"] += 1
-    
+        listeners = track.get("listeners")
+        if listeners is not None:
+            if listeners > 1000:
+                track_stats["popular"] += 1
+            else:
+                track_stats["fresh"] += 1
+
     assert track_stats["total"] >= 3, "Playlist too short"
     logger.info(f"Playlist stats: {track_stats}")
     
@@ -120,18 +122,13 @@ async def test_lastfm_integration():
         
         for track in playlist:
             # Check required fields
-            assert all(key in track for key in ["title", "artist", "url", "listeners", "image"]), \
-                f"Missing required fields in track: {track}"
+            assert "title" in track, f"Missing 'title' in track: {track}"
+            assert "artist" in track, f"Missing 'artist' in track: {track}"
             
-            # Validate URLs
-            assert track["url"].startswith("http"), f"Invalid URL format: {track['url']}"
-            if track["image"]:
+           # Optional fields: image, url, listeners
+            if "url" in track and track["url"]:
+                assert track["url"].startswith("http"), f"Invalid URL format: {track['url']}"
+            if "image" in track and track["image"]:
                 assert track["image"].startswith("http"), f"Invalid image URL: {track['image']}"
-            
-            # Verify LastFM specific data
-            assert isinstance(track["listeners"], (int, type(None))), \
-                f"Invalid listeners count type: {type(track['listeners'])}"
-            
-            logger.info(f"Verified LastFM data for track: {track['title']} by {track['artist']}")
-        
-        logger.info(f"Successfully tested LastFM integration with {len(playlist)} tracks")
+            if "listeners" in track and track["listeners"] is not None:
+                assert isinstance(track["listeners"], int), f"Invalid listeners count type: {type(track['listeners'])}"

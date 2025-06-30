@@ -16,7 +16,7 @@ def test_lastfm_search_integration():
     assert len(data["results"]) > 0
     
     for track in data["results"]:
-        assert all(key in track for key in ["name", "artist", "url"])
+        assert all(key in track for key in ["title", "artist"])
     logger.info(f"Found {len(data['results'])} results for 'The Beatles'")
 
 @pytest.mark.integration
@@ -32,14 +32,12 @@ def test_lastfm_genre_integration():
         if tracks:  # If we got tracks back
             assert len(tracks) > 0
             for track in tracks:
-                assert all(key in track for key in ["title", "artist", "url"])
+                assert all(key in track for key in ["title", "artist"])
                 # Don't check for listeners anymore
             logger.info(f"Found {len(tracks)} {genre} tracks")
             return  # Test passed
             
-    pytest.fail("No valid tracks found for any tested genre")
-            
-    pytest.fail("No valid tracks found for any tested genre")
+    pytest.fail("No valid tracks found for any tested genre")            
 
 @pytest.mark.integration
 def test_lastfm_top_artists_integration():

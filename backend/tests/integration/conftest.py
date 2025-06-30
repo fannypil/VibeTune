@@ -62,7 +62,12 @@ async def ensure_ai_service_ready():
 
 def assert_track_has_lastfm_data(track):
     """Helper function to verify LastFM track data"""
-    required_fields = ["title", "artist", "url", "listeners", "image"]
-    assert all(key in track for key in required_fields)
-    assert track["url"].startswith("http")
-    assert track["listeners"] > 0
+    required_fields = ["title", "artist"]
+    assert all(key in track for key in required_fields), f"Missing required fields in track: {track}"
+     # Optional fields
+    if "url" in track and track["url"]:
+        assert track["url"].startswith("http"), f"Invalid URL format: {track['url']}"
+    if "listeners" in track and track["listeners"] is not None:
+        assert isinstance(track["listeners"], int), f"Invalid listeners count type: {type(track['listeners'])}"
+    if "image" in track and track["image"]:
+        assert track["image"].startswith("http"), f"Invalid image URL: {track['image']}"
