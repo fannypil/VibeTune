@@ -9,7 +9,16 @@ VibeTune AI is an intelligent playlist creation platform that generates personal
 - **Stream Music**: Play via YouTube embeds (with partial playback for free accounts).
 - **Favorites & Playlist Management**: Mark playlists as favorites, rename, or delete them.
 - **Modern UI**: Responsive, accessible, and visually appealing interface built with React and Tailwind CSS.
-- **Authentication**: Secure user registration, login, and session management.
+- **Authentication**: secure JWT-based authentication for user registration and login, and session management.
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React (Vite), Tailwind CSS, JavaScript/JSX
+- **Backend:** FastAPI (Python), Pydantic, SQLAlchemy
+- **AI Agent:** Python (custom logic for mood/intent parsing)
+- **APIs:** YouTube Data API, LastFM API, Deezer API
+- **Database:** SQLite (default, can be swapped for PostgreSQL or others)
+- **Containerization:** Docker, Docker Compose
 
 ## 🏗️ Architecture
 VibeTune is built as a microservices-based application:
@@ -160,6 +169,13 @@ cd vibe-tune
 docker-compose up --build
 ```
 ---
+
+### 🌐 Accessing the Application
+
+- **Frontend:** [http://localhost:5173](http://localhost:5173)
+- **Backend API:** [http://localhost:8000](http://localhost:8000)
+- **AI Agent:** [http://localhost:8003](http://localhost:8003)
+- **API Documentation:** [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ## 🧪 Testing
 
