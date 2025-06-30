@@ -31,6 +31,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [fadeOut, setFadeOut] = useState(false);
 
     useEffect(() => {
     loadUser();
@@ -49,10 +50,13 @@ export default function Layout() {
     }
   };
 
-  const handleLogout = async () => {
+    const handleLogout = async () => {
     try {
       localStorage.removeItem('token');
-      navigate('/auth');
+      setFadeOut(true); // Trigger fade out
+      setTimeout(() => {
+        navigate('/auth');
+      }, 400); // Match the animation duration (0.4s)
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -120,7 +124,7 @@ export default function Layout() {
       </nav>
 
       {/* Main Content Area */}
-    <main className="flex-1 ml-64 min-h-screen overflow-y-auto bg-slate-50">
+      <main className={`flex-1 ml-64 min-h-screen overflow-y-auto bg-slate-50 transition-all duration-400 ${fadeOut ? 'animate-fade-out' : ''}`}>
         <Outlet />
       </main>
     </div>
