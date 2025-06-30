@@ -4,7 +4,7 @@ from typing import Optional
 from dotenv import load_dotenv
 from schemas.track import Track
 import random
-import logging
+from deezer_client import search_deezer_track_image
 
 load_dotenv()
 
@@ -16,8 +16,6 @@ def get_lastfm_top_tracks(limit=15):
     api_key = LASTFM_API_KEY
     if not api_key:
         raise Exception("Missing LASTFM_API_KEY environment variable")
-
-    # url = "http://ws.audioscrobbler.com/2.0/"
     params = {
         "method": "chart.gettoptracks",
         "api_key": api_key,
@@ -35,8 +33,6 @@ def get_lastfm_top_artists(limit=10):
     api_key = LASTFM_API_KEY
     if not api_key:
         raise Exception("Missing LASTFM_API_KEY environment variable")
-
-    # url = "http://ws.audioscrobbler.com/2.0/"
     params = {
         "method": "chart.gettopartists",
         "api_key": api_key,
@@ -52,7 +48,6 @@ def get_lastfm_top_artists(limit=10):
 
 def search_lastfm_tracks(query: str, limit: int = 10):
     api_key = LASTFM_API_KEY
-    # url = f"http://ws.audioscrobbler.com/2.0/"
     params = {
         "method": "track.search",
         "track": query,
@@ -109,12 +104,16 @@ class LastFMClient:
         data = response.json()
         try:
             track_data = data["results"]["trackmatches"]["track"][0]
+            image = (
+                search_deezer_track_image(f"{track_data['name']} {track_data['artist']}")
+                or (track_data["image"][-1]["#text"] if track_data.get("image") else None)
+                or "https://placehold.co/400x400?text=No+Image"
+            )
             return Track(
                 title=track_data["name"],
                 artist=track_data["artist"],
-                url=track_data.get("url"),
-                listeners=int(track_data.get("listeners", 0)),
-                image=track_data["image"][-1]["#text"] if track_data.get("image") else None
+                image=image
+              
             )
         except (IndexError, KeyError):
             return None
