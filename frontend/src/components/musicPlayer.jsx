@@ -3,10 +3,10 @@ import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-rea
 import YouTubeAudioPlayer from "./youTubeAudioPlayer";
 import { youtubeService } from "../services/youtubeService";
 
-export default function MusicPlayer({ track, onNext, onPrevious }) {
-  const [isPlaying, setIsPlaying] = useState(false);
+export default function MusicPlayer({ track, isPlaying, setIsPlaying, volume, setVolume, onNext, onPrevious }) {
+
+  const videoIdForTesting = 'aSugSGCC12I'; // Sabrina Carpenter - Manchild
   const [videoId, setVideoId] = useState(null);
-  const [volume, setVolume] = useState(70);
 
   // Fetch YouTube videoId only when track changes
     useEffect(() => {
@@ -70,7 +70,10 @@ export default function MusicPlayer({ track, onNext, onPrevious }) {
             min="0"
             max="100"
             value={volume}
-            onChange={e => setVolume(Number(e.target.value))}
+            onChange={e => {
+                setVolume(Number(e.target.value));
+                console.log("Slider changed to", e.target.value);
+                }}
             className="w-20 accent-purple-600"
           />
         </div>

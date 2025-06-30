@@ -15,6 +15,8 @@ export default function Home() {
   const [error, setError] = useState(null);
   const [currentTrack, setCurrentTrack] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(70);
+
 
   useEffect(() => {
     fetchTracks();
@@ -74,19 +76,7 @@ export default function Home() {
     // Implement previous track logic
     console.log("Previous track");
   };
-  const handlePlayTrack = async (track) => {
-  try {
-    setIsLoading(true);
-    // If track doesn't have videoId, it will be fetched in TrackCard
-    setCurrentTrack(track);
-    setIsPlaying(true);
-  } catch (error) {
-    console.error('Error playing track:', error);
-    // Show error to user
-  } finally {
-    setIsLoading(false);
-  }
-};
+
 
   return (
     <>
@@ -148,6 +138,10 @@ export default function Home() {
       </div>
       <MusicPlayer
         track={currentTrack}
+        isPlaying={isPlaying}
+        setIsPlaying={setIsPlaying}
+        volume={volume}
+        setVolume={setVolume}
         onNext={handleNext}
         onPrevious={handlePrevious}
       />

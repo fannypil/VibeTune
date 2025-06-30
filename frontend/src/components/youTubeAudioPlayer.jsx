@@ -18,9 +18,11 @@ export default function YouTubeAudioPlayer({ videoId, isPlaying, volume, onEnd }
   useEffect(() => {
     function createPlayer() {
       if (playerInstance.current) {
-        playerInstance.current.loadVideoById(videoId);
+         if (playerInstance.current.getVideoData().video_id !== videoId) {
+            playerInstance.current.loadVideoById(videoId);
+        }
         return;
-      }
+        }
       playerInstance.current = new window.YT.Player('youtube-player', {
         height: "300",
         width: "400",
@@ -47,7 +49,7 @@ export default function YouTubeAudioPlayer({ videoId, isPlaying, volume, onEnd }
       };
     }
     // eslint-disable-next-line
-  }, [videoId, volume, onEnd]);
+  }, [videoId, onEnd]);
 
       // Play/Pause logic
     useEffect(() => {
@@ -63,7 +65,8 @@ export default function YouTubeAudioPlayer({ videoId, isPlaying, volume, onEnd }
   // Volume logic
   useEffect(() => {
     if (playerInstance.current && playerReady) {
-      playerInstance.current.setVolume(volume);
+        console.log("Setting YouTube player volume to", volume);
+        playerInstance.current.setVolume(volume);
     }
   }, [volume, playerReady]);
 
