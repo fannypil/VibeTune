@@ -22,14 +22,14 @@ const handleSubmit = async (e) => {
         throw new Error(data.error);
       }
 
-      onSearchResults(data.results.map(track => ({
-        id: `${track.name}-${track.artist}`,
-        title: track.name,
-        artist: track.artist,
-        genre: 'all',
-        url: track.url,
-        image: track.image || "https://placehold.co/400x400?text=No+Image"
-      })));
+     onSearchResults(data.results.map(track => ({
+      id: `${track.title}-${track.artist}`,
+      title: track.title,
+      artist: track.artist,
+      genre: 'all',
+      url: track.url,
+      image: track.image || "https://placehold.co/400x400?text=No+Image"
+    })));
     } catch (err) {
       console.error('Search failed:', err);
     } finally {

@@ -13,17 +13,17 @@ const genreColors = {
 };
 
 export default function TrackCard({ track, onPlay, onAddToFavorites }) {
-    const {
+const {
     title,
     artist,
-    image = "https://placehold.co/400x400?text=No+Image",
+    image,
     genre = "unknown"
   } = track;
-  const handlePlay = async () => {
+const handlePlay = async () => {
   try {
     if (!track.videoId) {
-      console.log('Fetching video ID for:', track.title, track.artist);
-      const videoId = await youtubeService.getVideoId(track);
+      console.log('Fetching video ID for:', track.name, track.artist);
+      const videoId = await youtubeService.getVideoId({ title: track.name, artist: track.artist });
       if (!videoId) {
         throw new Error('No video found for this track');
       }
@@ -32,7 +32,6 @@ export default function TrackCard({ track, onPlay, onAddToFavorites }) {
     onPlay?.({ ...track, videoId: track.videoId });
   } catch (error) {
     console.error('Failed to play track:', error);
-    // Show error notification to user
     alert('Unable to play this track. Please try another one.');
   }
 };
@@ -75,7 +74,7 @@ export default function TrackCard({ track, onPlay, onAddToFavorites }) {
         <div className="space-y-3">
           <div>
             <h3 className="font-bold text-gray-900 text-lg leading-tight line-clamp-2 group-hover:text-indigo-600 transition-colors duration-300">
-              {track?.title}
+              {title}
             </h3>
             <p className="text-gray-600 font-medium mt-1">{track?.artist}</p>
           </div>

@@ -49,7 +49,10 @@ export default function Home() {
         fetchTracksByGenre(selectedGenre);
       }
     } else {
-      setTracks(searchResults);
+      setTracks(searchResults.map(track => ({
+        ...track,
+        name: track.title || track.name,
+      })));
       setSelectedGenre('all');
     }
   };
@@ -67,7 +70,19 @@ export default function Home() {
     // Implement previous track logic
     console.log("Previous track");
   };
-
+  const handlePlayTrack = async (track) => {
+  try {
+    setIsLoading(true);
+    // If track doesn't have videoId, it will be fetched in TrackCard
+    setCurrentTrack(track);
+    setIsPlaying(true);
+  } catch (error) {
+    console.error('Error playing track:', error);
+    // Show error to user
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <>
@@ -115,7 +130,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {tracks.map((track) => (
               <TrackCard
-                key={track.id}
+                key={track.id || `${track.title || track.name}-${track.artist}-${idx}`}
                 track={track}
                 onPlay={() => {
                   setCurrentTrack(track);

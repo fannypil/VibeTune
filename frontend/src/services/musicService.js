@@ -6,8 +6,8 @@ const trackService = {
       const response = await fetch(`${API_BASE_URL}/lastfm-top-tracks`);
       const data = await response.json();
       return data.results.map(track => ({
-        id: `${track.name}-${track.artist}`,
-        title: track.name,
+        id: `${track.title}-${track.artist}`,
+        title: track.title,
         artist: track.artist,
         genre: 'all',
         url: track.url,
@@ -41,7 +41,7 @@ async getTrendingTracks() {
     const data = await response.json();
     return data.results.map(track => ({
       id: `${track.name}-${track.artist}`,
-      title: track.name,
+      title: track.title,
       artist: track.artist,
       url: track.url,
       image: track.image || "https://placehold.co/400x400?text=No+Image"

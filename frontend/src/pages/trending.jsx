@@ -104,9 +104,9 @@ export default function Trending() {
               className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
             >
               <div className="w-full aspect-square rounded-lg overflow-hidden mb-4 bg-gray-100">
-                {artist.image_large ? (
+                {artist.image ? (
                   <img
-                    src={artist.image_large}
+                    src={artist.image}
                     alt={artist.name}
                     className="w-full h-full object-cover"
                   />
