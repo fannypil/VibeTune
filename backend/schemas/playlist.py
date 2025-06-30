@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
-from .track import TrackBase, TrackOut
+from .track import TrackBase, TrackOut, Track
 from datetime import datetime
 
 
@@ -25,7 +25,7 @@ class PlaylistOut(PlaylistBase):
     model_config = ConfigDict(from_attributes=True)  # Replace Config class
 
 class SearchResponse(BaseModel):
-    results: List[TrackBase]
+    results: List[Track]
     error: Optional[str] = None
 
 class PlaylistPromptRequest(BaseModel):

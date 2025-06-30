@@ -20,9 +20,8 @@ class TrackOut(TrackBase):
 class Track(BaseModel):
     title: str
     artist: str
-    url: Optional[str]
-    image: Optional[str]
-    listeners: Optional[int] =None
+    # videoId: str
+    image: Optional[str] = None
 
 class LLMResponseItem(BaseModel):
     title: str
@@ -30,3 +29,7 @@ class LLMResponseItem(BaseModel):
 
 class LLMResponse(BaseModel):
     songs: List[LLMResponseItem]
+
+class YouTubeTrack(BaseModel):
+    videoId: str
+    image: Optional[str]
