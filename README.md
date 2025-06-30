@@ -86,8 +86,6 @@ VibeTune/
 
 [![Watch the demo](https://img.youtube.com/vi/3R3Pl6spcmI/hqdefault.jpg)](https://www.youtube.com/watch?v=3R3Pl6spcmI)
 
-**[Demo Video Coming Soon]**
-
 ---
 ## 🔑 Getting API Keys
 
