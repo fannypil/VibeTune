@@ -100,7 +100,7 @@ class LastFMClient:
             "format": "json",
             "limit": 1,
         }
-        response = requests.get(self.base_url, params=params)  # <-- FIXED HERE
+        response = requests.get(self.base_url, params=params) 
         data = response.json()
         try:
             track_data = data["results"]["trackmatches"]["track"][0]

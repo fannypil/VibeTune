@@ -11,7 +11,6 @@ from db.models import Base, user
 
 
 # Create database tables
-# Base.metadata.create_all(bind=engine)
 user.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()

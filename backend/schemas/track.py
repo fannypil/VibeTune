@@ -30,6 +30,4 @@ class LLMResponseItem(BaseModel):
 class LLMResponse(BaseModel):
     songs: List[LLMResponseItem]
 
-class YouTubeTrack(BaseModel):
-    videoId: str
-    image: Optional[str]
+

@@ -12,23 +12,13 @@ logger = logging.getLogger(__name__)
 async def lastfm_top_tracks():
     try:
         tracks = get_lastfm_top_tracks()
-        # simplified_tracks = [
-        #     TrackBase(
-        #         name=track.get("name"),
-        #         artist=track.get("artist", {}).get("name"),
-        #         url=track.get("url")
-        #     )
-        #     for track in tracks
-        # ]
         simplified_tracks = []
         for track in tracks:
-            # video_id = await search_youtube_video(track.get("name"), track.get("artist"))
             image = search_deezer_track_image(f"{track.get('name')} {track.get('artist', {}).get('name')}")
             simplified_tracks.append(
                 Track(
                     title=track.get("name"),
                     artist=track.get("artist", {}).get("name"),
-                    # videoId=video_id,
                     image=image,
                 )
             )
@@ -40,14 +30,6 @@ async def lastfm_top_tracks():
 async def search_tracks(q: str = Query(..., description="Song name or artist to search")):
     try:
         tracks = search_lastfm_tracks(q)
-        # simplified_tracks = [
-        #     TrackBase(
-        #         name=track.get("name"),
-        #         artist=track.get("artist"),
-        #         url=track.get("url")
-        #     )
-        #     for track in tracks
-        # ]
         simplified_tracks = []
         for track in tracks:
             if not isinstance(track, dict):
@@ -90,16 +72,6 @@ async def lastfm_top_artists():
 async def get_tracks_for_genre(tag_name: str, limit: int = Query(20, le=50)):
     try:
         raw_tracks = get_tracks_by_tags(tag_name, limit)
-        # tracks = [
-        #     Track(
-        #         title=t["name"],
-        #         artist=t["artist"]["name"],
-        #         url=t.get("url"),
-        #         image=t["image"][-1]["#text"] if t.get("image") else None,
-        #         # listeners=None
-        #     )
-        #     for t in raw_tracks
-        # ]
         tracks=[]
         for t in raw_tracks:
             image = search_deezer_track_image(f"{t.get('name')} {t.get('artist', {}).get('name')}")

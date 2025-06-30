@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from schemas.playlist import PlaylistOut, PlaylistCreate, PlaylistUpdate, PlaylistSummary
-from schemas.track import TrackCreate, TrackOut
+from schemas.track import TrackOut
 from routes.auth import get_current_user
 from db.crud.playlist import  playlist_crud
 from db.session import get_db
