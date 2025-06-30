@@ -12,7 +12,7 @@ const genreColors = {
   indie: "bg-indigo-100 text-indigo-800"
 };
 
-export default function TrackCard({ track, onPlay, onAddToFavorites }) {
+export default function TrackCard({ track, onPlay, onAddToFavorites,readonly }) {
   const {
       title,
       artist,
@@ -37,16 +37,17 @@ export default function TrackCard({ track, onPlay, onAddToFavorites }) {
               <Music className="w-8 h-8 text-indigo-600" />
             </div>
           )}
-          
-          {/* Play button overlay */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
-            <button
-              className="w-14 h-14 rounded-full bg-white/90 hover:bg-white hover:scale-110 transition-all duration-300 opacity-0 group-hover:opacity-100 shadow-2xl flex items-center justify-center"
-              onClick={handlePlay}
-            >
-              <Play className="w-6 h-6 text-gray-800 ml-1" />
-            </button>
-          </div>
+             {/* Play button overlay */}
+          {!readonly && (
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+              <button
+                className="w-14 h-14 rounded-full bg-white/90 hover:bg-white hover:scale-110 transition-all duration-300 opacity-0 group-hover:opacity-100 shadow-2xl flex items-center justify-center"
+                onClick={handlePlay}
+              >
+                <Play className="w-6 h-6 text-gray-800 ml-1" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Genre badge */}
@@ -68,12 +69,6 @@ export default function TrackCard({ track, onPlay, onAddToFavorites }) {
 
           {/* Action buttons */}
           <div className="flex items-center justify-between pt-2">
-            <button 
-              className="p-2 rounded-full hover:bg-red-50 hover:text-red-600 transition-colors duration-300"
-              onClick={() => onAddToFavorites?.(track)}
-            >
-              <Heart className="w-5 h-5" />
-            </button>
             
             <button 
               className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-300"

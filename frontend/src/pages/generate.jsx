@@ -353,6 +353,7 @@ const handlePlaylistSaved = (savedPlaylist) => {
         <TrackCard
           key={track.id}
           track={track}
+          readonly={true}
           onPlay={() => {
             console.log("Playing:", track);
           }}

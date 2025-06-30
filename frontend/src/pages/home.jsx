@@ -126,6 +126,7 @@ export default function Home() {
               <TrackCard
                 key={track.id || `${track.title || track.name}-${track.artist}-${idx}`}
                 track={track}
+                readonly={false}
                 onPlay={() => {
                   setCurrentTrack(track);
                   setIsPlaying(true);
