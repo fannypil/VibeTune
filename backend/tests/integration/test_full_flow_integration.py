@@ -20,13 +20,13 @@ async def test_complete_user_journey():
         register_response = client.post(
             "/auth/register",
             json={
-                "username": "integration_test_user",
-                "email": "integration@test.com",
+                "username": test_username,
+                "email": test_email,
                 "password": "TestPass123",
                 "first_name": "Test",
                 "last_name": "User"
             }
-        )
+)
         assert register_response.status_code == 200
         logger.info("User registration successful")
 
@@ -34,7 +34,7 @@ async def test_complete_user_journey():
         login_response = client.post(
             "/auth/login",
             data={
-                "username": "integration@test.com",
+                "username": test_email,
                 "password": "TestPass123"
             }
         )
