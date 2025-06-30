@@ -4,6 +4,7 @@ import { ArrowLeft, Play, Pencil, Trash2, Music,Loader2 } from "lucide-react";
 import { playlistService } from "../services/playlistService";
 import RenamePlaylistDialog from "../components/renamePlaylistDialog";
 import DeletePlaylistAlert from "../components/deletePlaylistAlert";
+import MusicPlayer from "../components/musicPlayer";
 
 
 export default function PlaylistDetail() {
@@ -15,6 +16,11 @@ export default function PlaylistDetail() {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [removingTrackId, setRemovingTrackId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const [currentTrackIdx, setCurrentTrackIdx] = useState(null); 
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(70);
+  const currentTrack = playlist?.tracks?.[currentTrackIdx] || null;
 
   useEffect(() => {
     loadPlaylistData();
@@ -90,7 +96,21 @@ export default function PlaylistDetail() {
       setRemovingTrackId(null);
     }
   };
+  const handleNext = () => {
+    if (playlist?.tracks && currentTrackIdx !== null && currentTrackIdx < playlist.tracks.length - 1) {
+      setCurrentTrackIdx(currentTrackIdx + 1);
+      setIsPlaying(true);
+    } else {
+      setIsPlaying(false); // Stop at end
+    }
+  };
 
+  const handlePrevious = () => {
+    if (playlist?.tracks && currentTrackIdx > 0) {
+      setCurrentTrackIdx(currentTrackIdx - 1);
+      setIsPlaying(true);
+    }
+  };
   return (
     <div className={`p-8 max-w-7xl mx-auto transition-all duration-300 ${
       isDeleting ? 'animate-fade-out-scale' : ''
@@ -111,9 +131,17 @@ export default function PlaylistDetail() {
           <p className="text-gray-600 mb-4">{playlist?.description}</p>
           
           <div className="flex items-center gap-3">
-            <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-xl shadow-lg hover:from-purple-700 hover:to-indigo-700 transition-all flex items-center gap-2">
-              <Play className="w-5 h-5" /> Play All
-            </button>
+            <button
+                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-xl shadow-lg hover:from-purple-700 hover:to-indigo-700 transition-all flex items-center gap-2"
+                onClick={() => {
+                  if (playlist?.tracks?.length > 0) {
+                    setCurrentTrackIdx(0);
+                    setIsPlaying(true);
+                  }
+                }}
+              >
+                <Play className="w-5 h-5" /> Play All
+              </button>
             
             <button 
               onClick={() => setShowRenameDialog(true)}
@@ -161,7 +189,15 @@ export default function PlaylistDetail() {
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 bg-gray-200 rounded-md flex items-center justify-center">
-                      <Music className="w-4 h-4 text-gray-400" />
+                      {track.image ? (
+                          <img
+                            src={track.image}
+                            alt={track.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Music className="w-4 h-4 text-gray-400" />
+                        )}
                     </div>
                     <span className="font-medium text-gray-900">{track.name}</span>
                   </div>
@@ -195,6 +231,17 @@ export default function PlaylistDetail() {
         playlistTitle={playlist?.name}
       />
     </div>
+    {currentTrack && (
+      <MusicPlayer
+        track={currentTrack}
+        isPlaying={isPlaying}
+        setIsPlaying={setIsPlaying}
+        volume={volume}
+        setVolume={setVolume}
+        onNext={handleNext}
+        onPrevious={handlePrevious}
+      />
+    )}
     </div>
   );
 }
