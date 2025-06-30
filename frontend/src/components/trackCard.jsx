@@ -68,8 +68,7 @@ export default function TrackCard({ track, onPlay, onAddToFavorites,readonly }) 
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center justify-between pt-2">
-            
+          <div className="flex items-center justify-between pt-2">           
             <button 
               className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-300"
             >

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Music, Play, MoreHorizontal, Heart,HeartOff } from "lucide-react";
+import { Plus, Music, Play, Heart,HeartOff } from "lucide-react";
 import { playlistService } from "../services/playlistService";
-import TrackCard from "../components/trackCard";
 
 export default function Playlists() {
   const [playlists, setPlaylists] = useState([]);

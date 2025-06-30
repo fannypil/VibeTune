@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
 export default function YouTubeAudioPlayer({ videoId, isPlaying, volume, onEnd }) {
-  const playerRef = useRef(null);
   const playerInstance = useRef(null);
   const [playerReady, setPlayerReady] = useState(false);
 
@@ -17,12 +16,16 @@ export default function YouTubeAudioPlayer({ videoId, isPlaying, volume, onEnd }
      // Create the player ONCE when the API is ready and videoId is set
   useEffect(() => {
     function createPlayer() {
-      if (playerInstance.current) {
-         if (playerInstance.current.getVideoData().video_id !== videoId) {
-            playerInstance.current.loadVideoById(videoId);
+      if (
+        playerInstance.current &&
+        typeof playerInstance.current.getVideoData === "function"
+      ) {
+        // Only load a new video if the videoId has changed
+        if (playerInstance.current.getVideoData().video_id !== videoId) {
+          playerInstance.current.loadVideoById(videoId);
         }
         return;
-        }
+      }
       playerInstance.current = new window.YT.Player('youtube-player', {
         height: "300",
         width: "400",
