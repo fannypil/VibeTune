@@ -89,7 +89,7 @@ VibeTune/
 ---
 ## 🔑 Getting API Keys
 
-Before running VibeTune, you’ll need API keys for YouTube and LastFM. Here’s how to get them:
+Before running VibeTune, you’ll need API keys for YouTube , LastFM and Google Gemini. Here’s how to get them:
 
 ### 1. YouTube API Key
 
@@ -109,6 +109,13 @@ Before running VibeTune, you’ll need API keys for YouTube and LastFM. Here’s
 4. Copy your API key and add it to your `.env.example` file as `LASTFM_API_KEY`.
 5. Copy your Shared secret and add it to your `.env.example` file as `SECRET_KEY`.
 
+### 3. Google Gemini API Key
+1.  Go to [Google AI Studio](https://aistudio.google.com/app/apikey).
+2.  Sign in with your Google account.
+3.  Click **"Create API key"**.
+4.  Choose an existing Google Cloud project or create a new one.
+5.  Copy your newly generated API key and add it to your `.env` file as `GEMINI_API_KEY`.
+
 ---
 ## 🛠️ Environment Setup
 
@@ -124,6 +131,7 @@ Before running VibeTune, you need to configure your environment variables. This 
    SECRET_KEY=your_generated_secret_key
    DATABASE_URL=sqlite:///./backend.db
    YOUTUBE_API_KEY=your_youtube_api_key_here
+   GEMINI_API_KEY=your_gemini_api_key_here
    ```
 
    - Make sure to replace the placeholders with your actual API keys and secret.
@@ -151,6 +159,7 @@ Continue with the [Getting Started](#-getting-started) section to launch VibeTun
 - Docker (recommended) or Python 3.10+ and Node.js 18+
 - YouTube API key
 - LastFM API key
+- Google Gemini API key
 
 ### Quick Start (with Docker)
 
