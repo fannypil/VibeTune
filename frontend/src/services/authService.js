@@ -19,7 +19,7 @@ export const authService = {
     return response.json();
   },
 
-  async register({ username, email, firstName, lastName, password }) {
+   async register({ username, email, firstName, lastName, password }) {
     const response = await fetch(`${API_BASE_URL}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -32,12 +32,22 @@ export const authService = {
       })
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || 'Registration failed');
+      // Create a custom error that includes the detailed validation data
+      const error = new Error(data.detail || 'Registration failed');
+      
+      // Check for FastAPI's detailed validation error format
+      if (response.status === 422 && Array.isArray(data.detail)) {
+        error.message = 'Please correct the errors below.'; // Set a general message
+        error.validationDetails = data.detail; // Attach the array of specific errors
+      }
+      
+      throw error;
     }
 
-    return response.json();
+    return data;
   },
 
 async getCurrentUser() {
