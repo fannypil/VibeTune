@@ -1,5 +1,5 @@
 import httpx
-from typing import Dict
+from typing import Dict,List
 import logging
 from schemas.quiz import QuizRequest
 

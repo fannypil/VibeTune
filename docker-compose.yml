@@ -5,7 +5,7 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ./backend/.env
+      - ./.env
     networks:
       - app-network
     depends_on:
@@ -33,27 +33,22 @@ services:
     build: ./ai_agent
     ports:
       - "8003:8003"
-      - "11434:11434"  # Add Ollama's port
-    volumes:
-      - ollama_data:/root/.ollama
     networks:
       - app-network
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
       interval: 30s
       timeout: 10s
-      retries: 5
-      start_period: 10s
-    environment:
-      - OLLAMA_HOST=0.0.0.0
-      - OLLAMA_ORIGINS=*
+      retries: 3
+      start_period: 5s
 
 networks:
   app-network:
     driver: bridge
 
 volumes:
-  ollama_data:
   db_data:
   
 
